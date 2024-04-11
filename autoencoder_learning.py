@@ -18,7 +18,7 @@ from autoencoder import autoencoder_model
 
 
 # variables
-max_len = 48
+max_len = 96
 ratio_of_samples_to_use = 0.025
 n_samples = 100000
 num_seq = 10000
@@ -34,8 +34,8 @@ monomer_dict = {
     'U': 'C(C(C(=O)O)N)[Se]', 'water': 'O'
 }
 # hyperparameters
-height = 43
-width = 48
+height = 46
+width = 96
 channels = 1
 latent_dim = height
 learning_rate = 1e-3
