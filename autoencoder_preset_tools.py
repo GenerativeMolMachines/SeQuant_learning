@@ -21,7 +21,18 @@ def make_monomer_descriptors(monomer_dict: dict[str, str]) -> pd.DataFrame:
     sc = MinMaxScaler(feature_range=(-1, 1))
     scaled_array = sc.fit_transform(descriptors_set)
     descriptors_set = pd.DataFrame(scaled_array, columns=descriptor_names, index=monomer_dict.keys())
-    return descriptors_set
+
+    energy_data = pd.read_csv('data/final_energy_set.csv')
+    energy_set = energy_data.set_index("Aminoacid").iloc[:, :]
+
+    energy_names = energy_set.columns
+
+    scaled_energy = sc.fit_transform(energy_set)
+    scaled_energy_set = pd.DataFrame(scaled_energy, columns=energy_names, index=monomer_dict.keys())
+    scaled_energy_set.loc['water'].fillna(-1, inplace=True)
+
+    all_descriptors = pd.concat([descriptors_set, scaled_energy_set], axis=1)
+    return all_descriptors
 
 
 def seq_to_matrix(
