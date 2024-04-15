@@ -51,7 +51,7 @@ labeled_data = labeled_data.replace('+', 1)
 labeled_data = labeled_data.fillna(0)
 labeled_data = labeled_data.drop(labeled_data[labeled_data.SEQ.str.contains(r'[@#&$%+-/*BXZ]')].index)
 labeled_data_seqs = labeled_data['SEQ'].to_list()
-
+"""
 # Processing unlabeled data (Non-AMPs and CPPBase)
 with open('data/Non-AMPs.txt') as f:
     file = f.readlines()
@@ -101,9 +101,9 @@ dbaasp = pd.read_csv('data/peptides.csv')
 dbaasp_2 = pd.read_csv('data/peptides_2.csv')
 unlabeled_data_6 = list(
     dict.fromkeys(dbaasp['SEQUENCE'].astype('str').tolist() + dbaasp_2['SEQUENCE'].astype('str').tolist()))
-
+"""
 # Merged data for CAE training
-all_seqs = labeled_data_seqs + unlabeled_data + unlabeled_data_2 + unlabeled_data_3 + unlabeled_data_4 + unlabeled_data_5 + unlabeled_data_6
+all_seqs = labeled_data_seqs
 
 all_seqs = filter_sequences(all_seqs, monomer_dict)
 all_seqs = [seq for seq in all_seqs if len(seq) <= max_len]
@@ -195,4 +195,4 @@ plt.yticks(np.arange(0, 0.8, 0.1))
 plt.title("Autoencoder learning")
 
 plt.legend()
-plt.show()
+plt.savefig('figures/test.png')
