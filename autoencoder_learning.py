@@ -20,7 +20,7 @@ from autoencoder import autoencoder_model
 # variables
 max_len = 96
 ratio_of_samples_to_use = 0.025
-n_samples = 100000
+n_samples = 100
 num_seq = 10000
 pad = -1
 monomer_dict = {
