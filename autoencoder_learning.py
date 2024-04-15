@@ -35,7 +35,7 @@ monomer_dict = {
 }
 # hyperparameters
 height = 46
-width = 48
+width = 96
 channels = 1
 latent_dim = height
 learning_rate = 1e-3
@@ -169,7 +169,6 @@ history = autoencoder.fit(
     X_train,
     X_train,
     epochs=epochs,
-    batch_size=batch_size,
     validation_data=(X_test, X_test),
     verbose=2,
     callbacks=[early_stop, model_checkpoint_callback]
