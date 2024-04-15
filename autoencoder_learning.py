@@ -179,7 +179,7 @@ with open('trainHistoryDict/trainHistoryDict' + str(num_seq) + '_maxlen' + str(m
     pickle.dump(history.history, file_pi)
 
 # load model learning history
-with open('trainHistoryDict' + str(num_seq) + '_maxlen' + str(max_len) + '_' + str(
+with open('trainHistoryDict/trainHistoryDict' + str(num_seq) + '_maxlen' + str(max_len) + '_' + str(
         pad) + 'pad_alldescs_norm-1to1_batch' + str(batch_size) + '_lr' + str(learning_rate), 'rb') as f:
     learning_history = pickle.load(f)
 
