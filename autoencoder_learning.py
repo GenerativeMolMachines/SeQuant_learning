@@ -35,7 +35,7 @@ monomer_dict = {
 }
 # hyperparameters
 height = 46
-width = 48
+width = 96
 channels = 1
 latent_dim = height
 learning_rate = 1e-3
