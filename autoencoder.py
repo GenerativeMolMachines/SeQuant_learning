@@ -19,12 +19,12 @@ def encoder(x: KerasTensor, height: int) -> tf.Tensor:
     x = Conv2D(121, (1, 4), padding='same')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.2)(x)
-    x = AveragePooling2D((1, 3))(x)
+    x = AveragePooling2D((1, 4))(x)
 
     x = Conv2D(121, (1, 4), padding='same')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.2)(x)
-    x = AveragePooling2D((1, 2))(x)
+    x = AveragePooling2D((1, 3))(x)
 
     x = Conv2D(height, (1, 4), padding='same')(x)
     x = BatchNormalization()(x)
@@ -67,11 +67,11 @@ def decoder(x: KerasTensor, height: int) -> tf.Tensor:
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.2)(x)
 
-    x = Conv2DTranspose(121, (1, 4), strides=(1, 2), padding='same')(x)
+    x = Conv2DTranspose(121, (1, 4), strides=(1, 3), padding='same')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.2)(x)
 
-    x = Conv2DTranspose(121, (1, 4), strides=(1, 3), padding='same')(x)
+    x = Conv2DTranspose(121, (1, 4), strides=(1, 4), padding='same')(x)
     x = BatchNormalization()(x)
     x = Activation('tanh')(x)
     return x
