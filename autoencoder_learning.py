@@ -169,7 +169,6 @@ history = autoencoder.fit(
     X_train,
     X_train,
     epochs=epochs,
-    batch_size=batch_size,
     validation_data=(X_test, X_test),
     verbose=2,
     callbacks=[early_stop, model_checkpoint_callback]
