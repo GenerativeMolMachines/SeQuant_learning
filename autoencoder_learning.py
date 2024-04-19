@@ -174,12 +174,12 @@ history = autoencoder.fit(
     callbacks=[early_stop, model_checkpoint_callback]
 )
 
-with open('trainHistoryDict/3_trainHistoryDict' + str(num_seq) + '_maxlen' + str(max_len) + '_' + str(
+with open('trainHistoryDict/4_trainHistoryDict' + str(num_seq) + '_maxlen' + str(max_len) + '_' + str(
         pad) + 'pad_alldescs_norm-1to1_batch' + str(batch_size) + '_lr' + str(learning_rate), 'wb') as file_pi:
     pickle.dump(history.history, file_pi)
 
 # load model learning history
-with open('trainHistoryDict/3_trainHistoryDict' + str(num_seq) + '_maxlen' + str(max_len) + '_' + str(
+with open('trainHistoryDict/4_trainHistoryDict' + str(num_seq) + '_maxlen' + str(max_len) + '_' + str(
         pad) + 'pad_alldescs_norm-1to1_batch' + str(batch_size) + '_lr' + str(learning_rate), 'rb') as f:
     learning_history = pickle.load(f)
 
@@ -194,4 +194,4 @@ plt.yticks(np.arange(0, 0.1, 0.005))
 plt.title("Autoencoder learning")
 
 plt.legend()
-plt.savefig('figures/3.png')
+plt.savefig('figures/4.png')

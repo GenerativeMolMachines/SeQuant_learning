@@ -20,7 +20,19 @@ def encoder(x: KerasTensor, height: int) -> tf.Tensor:
     x = Conv2D(height, (1, 4), padding='same')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.2)(x)
-    x = AveragePooling2D((1, 4))(x)
+    x = AveragePooling2D((1, 2))(x)
+    x = Dropout(0.1)(x)
+
+    x = Conv2D(height, (1, 4), padding='same')(x)
+    x = BatchNormalization()(x)
+    x = LeakyReLU(alpha=0.2)(x)
+    x = AveragePooling2D((1, 2))(x)
+    x = Dropout(0.1)(x)
+
+    x = Conv2D(height, (1, 4), padding='same')(x)
+    x = BatchNormalization()(x)
+    x = LeakyReLU(alpha=0.2)(x)
+    x = AveragePooling2D((1, 2))(x)
     x = Dropout(0.1)(x)
 
     x = Conv2D(height, (1, 4), padding='same')(x)
@@ -29,22 +41,10 @@ def encoder(x: KerasTensor, height: int) -> tf.Tensor:
     x = AveragePooling2D((1, 3))(x)
     x = Dropout(0.1)(x)
 
-    x = Conv2D(height, (1, 4), padding='same')(x)
-    x = BatchNormalization()(x)
-    x = LeakyReLU(alpha=0.2)(x)
-    x = AveragePooling2D((1, 2))(x)
-    x = Dropout(0.1)(x)
-
-    x = Conv2D(height, (1, 4), padding='same')(x)
-    x = BatchNormalization()(x)
-    x = LeakyReLU(alpha=0.2)(x)
-    x = AveragePooling2D((1, 2))(x)
-    x = Dropout(0.1)(x)
-
     x = Conv2D(1, (1, 4), padding='same')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.2)(x)
-    x = AveragePooling2D((1, 2))(x)
+    x = AveragePooling2D((1, 4))(x)
     x = Dropout(0.1)(x)
     return x
 
@@ -61,15 +61,7 @@ def latent_space(x: KerasTensor, latent_dim: int) -> tf.Tensor:
 
 
 def decoder(x: KerasTensor, height: int) -> tf.Tensor:
-    x = Conv2DTranspose(1, (1, 4), strides=(1, 2), padding='same')(x)
-    x = BatchNormalization()(x)
-    x = LeakyReLU(alpha=0.2)(x)
-
-    x = Conv2DTranspose(height, (1, 4), strides=(1, 2), padding='same')(x)
-    x = BatchNormalization()(x)
-    x = LeakyReLU(alpha=0.2)(x)
-
-    x = Conv2DTranspose(height, (1, 4), strides=(1, 2), padding='same')(x)
+    x = Conv2DTranspose(1, (1, 4), strides=(1, 4), padding='same')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.2)(x)
 
@@ -77,7 +69,15 @@ def decoder(x: KerasTensor, height: int) -> tf.Tensor:
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.2)(x)
 
-    x = Conv2DTranspose(height, (1, 4), strides=(1, 4), padding='same')(x)
+    x = Conv2DTranspose(height, (1, 4), strides=(1, 2), padding='same')(x)
+    x = BatchNormalization()(x)
+    x = LeakyReLU(alpha=0.2)(x)
+
+    x = Conv2DTranspose(height, (1, 4), strides=(1, 2), padding='same')(x)
+    x = BatchNormalization()(x)
+    x = LeakyReLU(alpha=0.2)(x)
+
+    x = Conv2DTranspose(height, (1, 4), strides=(1, 2), padding='same')(x)
     x = BatchNormalization()(x)
     x = Activation('tanh')(x)
     return x
