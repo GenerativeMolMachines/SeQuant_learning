@@ -1,4 +1,5 @@
 import os
+import time
 import pickle
 import pandas as pd
 import numpy as np
@@ -16,6 +17,8 @@ from autoencoder_preset_tools import (
 )
 from autoencoder import autoencoder_model
 
+# timer
+start_time = time.time()
 
 # variables
 max_len = 96
@@ -195,3 +198,5 @@ plt.title("Autoencoder learning")
 
 plt.legend()
 plt.savefig('figures/4.png')
+
+print("--- %s seconds ---" % (time.time() - start_time))
