@@ -192,7 +192,7 @@ x_axis = range(1, len(loss_hist) + 1)
 
 plt.plot(x_axis, loss_hist, color='r', label='loss')
 plt.plot(x_axis, val_loss_hist, color='g', label='val_loss')
-plt.yticks(np.arange(0, 0.1, 0.005))
+plt.yticks(np.arange(0, 0.5, 0.01))
 
 plt.title("Autoencoder learning")
 
