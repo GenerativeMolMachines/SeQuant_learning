@@ -77,12 +77,39 @@ df['len']  = df['s'].str.len()
 for i in aa_dict.keys():
   df[i] = df['s'].str.count(i)
 
-train, test = train_test_split(df, test_size=0.3, random_state=0, stratify=df[['A', 'R', 'N', 'D', 'C', 'Q', 'E', 'G', 'H', 'I', 'L', 'K', 'M', 'F', 'P', 'S', 'T', 'W']])
+rand_st = 0
+train, test = train_test_split(df, shuffle=True, test_size=0.3, random_state=rand_st)
+
+for i in range(150):
+        train, test = train_test_split(df, shuffle=True, test_size=0.3, random_state=rand_st)
+        train_distr = train.describe()
+        train_distr_mean = train_distr.loc['mean']
+
+        test_distr = test.describe()
+        test_distr_mean = test_distr.loc['mean']
+
+        result_minus = abs(test_distr_mean-train_distr_mean)
+        aa_distribution = result_minus.drop('len')
+        if test_distr.loc['max', 'len'] > train_distr.loc['max', 'len']:
+            rand_st += 1
+            continue
+        elif aa_distribution[aa_distribution>0.1].shape[0] > 0:
+            rand_st += 1
+            continue
+        elif result_minus['len'] > 0.5:
+            rand_st += 1
+            continue
+
+        else:
+            break
+test_distr.to_csv('test_distr.csv')
+train_distr.to_csv('train_distr.csv')
+
 train_seq_ = train['s'].to_list()
-with open('parrot.pkl', 'wb') as f:
+with open('train_seq_.pkl', 'wb') as f:
    pickle.dump(train_seq_, f)
 del train_seq_
 
 test_seq_ = test['s'].to_list()
-with open('parrot.pkl', 'wb') as f:
+with open('test_seq_.pkl', 'wb') as f:
    pickle.dump(test_seq_, f)
