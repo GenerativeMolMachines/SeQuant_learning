@@ -102,8 +102,8 @@ for i in range(150):
 
         else:
             break
-test_distr.to_csv('test_distr.csv')
-train_distr.to_csv('train_distr.csv')
+test_distr.to_csv(f"test_distr_{rand_st}.csv")
+train_distr.to_csv(f"train_distr_{rand_st}.csv")
 
 train_seq_ = train['s'].to_list()
 with open('train_seq_.pkl', 'wb') as f:
