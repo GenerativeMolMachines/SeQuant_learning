@@ -42,6 +42,7 @@ for name in prot_list:
         if set(sequence).issubset(set(monomer_dict)):
             if sequence not in full_s:
                 full_s.append(sequence)
+                print(f"{name} success")
     except:
         continue
 
