@@ -3,10 +3,12 @@ import pickle
 from joblib import Parallel, delayed
 
 
+list_seq = []
+
+
 def make_pickle_files(
     sequence_files_name: str
 ):
-    list_seq = []
     one_len_seq_list = []
     fasta_sequences = SeqIO.parse(open(sequence_files_name), 'fasta')
 
