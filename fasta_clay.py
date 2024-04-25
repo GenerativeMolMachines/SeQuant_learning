@@ -16,7 +16,7 @@ def make_pickle_files(
             one_len_seq_list.append(sequence)
 
         one_len_seq_list_unique = list(set(one_len_seq_list))
-        print(sequence_files_name, len(one_len_seq_list_unique))
+        print(file_name, len(one_len_seq_list_unique))
         list_seq.extend(one_len_seq_list_unique)
         print(len(list_seq))
 
