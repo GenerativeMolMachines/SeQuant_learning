@@ -1,5 +1,7 @@
 import pickle
 import requests
+import numpy as np
+from tqdm import tqdm
 
 
 species = "Homo sapiens"
@@ -13,7 +15,7 @@ aa_set = {'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L',
 search_params = {
     "db": "protein",
     "term": f"({length}[SLEN] AND ((animals[filter] OR bacteria[filter]))",
-    "retmax": 600000,  # Adjust retmax as needed
+    "retmax": 200000,  # Adjust retmax as needed
     "retmode": "json"
 }
 response = requests.get(search_url, params=search_params)
@@ -24,30 +26,34 @@ if int(search_results["esearchresult"]["count"]) == 0:
 
 id_list = search_results["esearchresult"]["idlist"]
 
+several_id_lists = np.array_split(np.asarray(search_results["esearchresult"]["idlist"]), 2000)
+seq_list = []
+print('start_parse')
 # Step 2: Fetch the sequences using the IDs
-fetch_params = {
-    "db": "protein",
-    "id": ",".join(id_list),
-    "rettype": "fasta",
-    "retmode": "text"
-}
-response = requests.get(fetch_url, params=fetch_params)
+for id_l in tqdm(several_id_lists):
+    fetch_params = {
+        "db": "protein",
+        "id": ",".join(list(id_l)),
+        "rettype": "fasta",
+        "retmode": "text"
+    }
+    response = requests.get(fetch_url, params=fetch_params)
 
-if response.ok:
-    sequences_text = response.text.split('\n\n')[:-1]
-    seq_list = []
-    for b in sequences_text:
-        c = b.split('\n')
-        s = c[1]
-        if s not in seq_list and set(s).issubset(aa_set):
-            seq_list.append(c[1])
+    if response.ok:
+        print('ok')
+        sequences_text = response.text.split('\n\n')[:-1]
+        for b in sequences_text:
+            c = b.split('\n')
+            s = c[1]
+            if s not in seq_list and set(s).issubset(aa_set):
+                seq_list.append(c[1])
+    else:
+        print(f"Failed to fetch sequences: {response.status_code} - {response.reason}")
 
-    print(seq_list[0])
-    print('len(seq_list)', len(seq_list))
-    with open(f"seq_{length}.pkl", 'wb') as f:
-        pickle.dump(seq_list, f)
-else:
-    print(f"Failed to fetch sequences: {response.status_code} - {response.reason}")
+print(seq_list[0])
+print('len(seq_list)', len(seq_list))
+with open(f"seq_{length}.pkl", 'wb') as f:
+    pickle.dump(seq_list, f)
 
 
 
