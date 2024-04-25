@@ -12,7 +12,7 @@ aa_set = {'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L',
 # Step 1: Perform the search to get the IDs of matching sequences
 search_params = {
     "db": "protein",
-    "term": f"({length}[SLEN]",
+    "term": f"({length}[SLEN] AND ((animals[filter] OR bacteria[filter]))",
     "retmax": 600000,  # Adjust retmax as needed
     "retmode": "json"
 }
