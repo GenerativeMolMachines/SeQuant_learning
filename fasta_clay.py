@@ -12,7 +12,7 @@ def make_pickle_files(
         fasta_sequences = SeqIO.parse(open(s_file_name), 'fasta')
 
         for fasta in fasta_sequences:
-            name, sequence = fasta.id, str(fasta.seq)
+            sequence = str(fasta.seq)
             one_len_seq_list.append(sequence)
 
         one_len_seq_list_unique = list(set(one_len_seq_list))
