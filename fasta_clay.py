@@ -4,23 +4,22 @@ from joblib import Parallel, delayed
 
 
 def make_pickle_files(
-    sequence_files_name: list
+    sequence_files_name: str
 ):
     list_seq = []
-    for s_file_name in sequence_files_name:
-        one_len_seq_list = []
-        fasta_sequences = SeqIO.parse(open(s_file_name), 'fasta')
+    one_len_seq_list = []
+    fasta_sequences = SeqIO.parse(open(sequence_files_name), 'fasta')
 
-        for fasta in fasta_sequences:
-            sequence = str(fasta.seq)
-            one_len_seq_list.append(sequence)
+    for fasta in fasta_sequences:
+        sequence = str(fasta.seq)
+        one_len_seq_list.append(sequence)
 
-        one_len_seq_list_unique = list(set(one_len_seq_list))
-        list_seq.extend(one_len_seq_list_unique)
+    one_len_seq_list_unique = list(set(one_len_seq_list))
+    list_seq.extend(one_len_seq_list_unique)
 
-        with open("seq_40_96.pkl", 'wb') as f:
-            pickle.dump(list_seq, f)
-        del one_len_seq_list_unique
+    with open("seq_40_96.pkl", 'wb') as f:
+        pickle.dump(list_seq, f)
+    del one_len_seq_list_unique
 
 
 if __name__ == "__main__":
