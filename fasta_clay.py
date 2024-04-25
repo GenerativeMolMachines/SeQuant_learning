@@ -7,9 +7,9 @@ def make_pickle_files(
     sequence_files_name: list
 ):
     list_seq = []
-    for file_name in sequence_files_name:
+    for s_file_name in sequence_files_name:
         one_len_seq_list = []
-        fasta_sequences = SeqIO.parse(open(file_name), 'fasta')
+        fasta_sequences = SeqIO.parse(open(s_file_name), 'fasta')
 
         for fasta in fasta_sequences:
             name, sequence = fasta.id, str(fasta.seq)
@@ -18,7 +18,7 @@ def make_pickle_files(
         one_len_seq_list_unique = list(set(one_len_seq_list))
         list_seq.extend(one_len_seq_list_unique)
 
-        with open(f"seq_40_96.pkl", 'wb') as f:
+        with open("seq_40_96.pkl", 'wb') as f:
             pickle.dump(list_seq, f)
         del one_len_seq_list_unique
 
