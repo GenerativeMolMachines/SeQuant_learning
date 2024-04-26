@@ -9,8 +9,7 @@ fetch_url = base_url + "efetch.fcgi"
 aa_set = {'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L',
               'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'Y'}
 # Step 1: Perform the search to get the IDs of matching sequences
-all_sequences = []
-for length in range(41, 97, 1):
+for length in range(43, 60, 1):
     search_params = {
         "db": "protein",
         "term": f"({length}[SLEN] AND ((animals[filter] OR bacteria[filter]))",
@@ -20,6 +19,8 @@ for length in range(41, 97, 1):
     response = requests.get(search_url, params=search_params)
     search_results = response.json()
 
+    if search_results["esearchresult"] is not None:
+        print(f"len={length} ok")
 
     if int(search_results["esearchresult"]["count"]) == 0:
         print(f"No sequences found with the specified length={length}.")
@@ -56,9 +57,6 @@ for length in range(41, 97, 1):
     with open(f"data/pkl_from_parser/seq_{length}_{len(seq_list)}.pkl", 'wb') as f:
         pickle.dump(seq_list, f)
 
-    all_sequences.extend(seq_list)
-with open(f"seq_all_parser_{len(all_sequences)}_41_96.pkl", 'wb') as f:
-    pickle.dump(all_sequences, f)
 
 
 
@@ -101,4 +99,4 @@ with open(f"seq_all_parser_{len(all_sequences)}_41_96.pkl", 'wb') as f:
 #
 # print('len full_s', len(full_s))
 # with open('clusters_prot_40_90.pkl', 'wb') as f:
-#     pickle.dump(full_s, f)
+#     pickle.dump(full_s, f
