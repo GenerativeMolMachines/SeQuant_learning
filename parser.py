@@ -32,6 +32,7 @@ for length in range(40, 97, 1):
     # Step 2: Fetch the sequences using the IDs
     for id_l in several_id_lists:
         if len(seq_list) > 6:
+            print('more then break')
             break
         fetch_params = {
             "db": "protein",
@@ -56,7 +57,7 @@ for length in range(40, 97, 1):
         pickle.dump(seq_list, f)
 
     all_sequences.extend(seq_list)
-    print('len(all_sequences)', len(seq_list))
+    print('len(all_sequences)', len(all_sequences))
 with open(f"seq_all_parser_{len(all_sequences)}.pkl", 'wb') as f:
     pickle.dump(all_sequences, f)
 
