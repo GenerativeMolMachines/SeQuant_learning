@@ -20,17 +20,19 @@ for length in range(41, 97, 1):
     response = requests.get(search_url, params=search_params)
     search_results = response.json()
 
+
     if int(search_results["esearchresult"]["count"]) == 0:
         print(f"No sequences found with the specified length={length}.")
         continue
 
+
     id_list = search_results["esearchresult"]["idlist"]
 
-    several_id_lists = np.array_split(np.asarray(search_results["esearchresult"]["idlist"]), 2500)
+    several_id_lists = np.array_split(np.asarray(id_list), 2500)
     seq_list = []
     # Step 2: Fetch the sequences using the IDs
     for id_l in several_id_lists:
-        if len(seq_list) > 6:
+        if len(seq_list) > 80000:
             print('more then break')
             break
         fetch_params = {
