@@ -5,10 +5,10 @@ import os
 def check_seq_list(path):
     with open(f"data/{path}", "rb") as input_file:
         already_exist = pickle.load(input_file)
-    print(len(already_exist))
+    print(len(list(set(already_exist))))
     print('len 0', len(already_exist[0]))
     print('0', already_exist[0])
-    print('len 0', len(already_exist[0]))
+    print('len -1', len(already_exist[-1]))
     print('-1', already_exist[-1])
 
 
