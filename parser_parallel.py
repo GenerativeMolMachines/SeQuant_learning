@@ -52,9 +52,9 @@ def parser_by_len(length):
             sequences_text = response.text.split('\n\n')[:-1]
             for b in sequences_text:
                 c = b.split('\n')
-                s = c[1]
+                s = c[1] + c[2]
                 if s not in seq_list and set(s).issubset(aa_set):
-                    seq_list.append(c[1])
+                    seq_list.append(s)
         else:
             print(f"Failed to fetch sequences length={length}: {response.status_code} - {response.reason}")
 
@@ -66,6 +66,6 @@ func_out = Parallel(n_jobs=2)(
     [
         delayed(parser_by_len)(
             length
-        ) for length in range(60, 97, 1)
+        ) for length in range(71, 97, 1)
     ]
 )
