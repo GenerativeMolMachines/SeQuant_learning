@@ -7,7 +7,7 @@ def check_seq_list(path):
         already_exist = pickle.load(input_file)
     print(len(already_exist))
     print('len 0', len(already_exist[0]))
-    print('0', already_exist)
+    print('0', already_exist[0])
     print('len 0', len(already_exist[0]))
     print('-1', already_exist[-1])
 
