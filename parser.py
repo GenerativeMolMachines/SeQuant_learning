@@ -9,7 +9,7 @@ fetch_url = base_url + "efetch.fcgi"
 aa_set = {'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L',
               'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'Y'}
 # Step 1: Perform the search to get the IDs of matching sequences
-for length in range(43, 60, 1):
+for length in range(55, 60, 1):
     search_params = {
         "db": "protein",
         "term": f"({length}[SLEN] AND ((animals[filter] OR bacteria[filter]))",
