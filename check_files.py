@@ -33,6 +33,7 @@ def select_folder():
     print('select folder')
     print('1. sequential')
     print('2. parallel')
+    print('3. seq_40_more')
     folder_choise = input()
     if int(folder_choise) == 1:
         path += 'pkl_from_parser/'
@@ -42,6 +43,14 @@ def select_folder():
         path += 'pkl_from_parser_prl/'
         path += select_file(path)
         check_seq_list(path)
+    elif int(folder_choise) == 3:
+        with open(r"data/seq_40_more.pkl", "rb") as input_file:
+            already_exist = pickle.load(input_file)
+        print(len(list(set(already_exist))))
+        print('len 0', len(already_exist[0]))
+        print('0', already_exist[0])
+        print('len -1', len(already_exist[-1]))
+        print('-1', already_exist[-1])
     else:
         print('no option exists')
         return
