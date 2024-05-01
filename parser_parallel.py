@@ -9,6 +9,8 @@ search_url = base_url + "esearch.fcgi"
 fetch_url = base_url + "efetch.fcgi"
 aa_set = {'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L',
               'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'Y'}
+
+
 # Step 1: Perform the search to get the IDs of matching sequences
 def parser_by_len(length):
     search_params = {
@@ -52,13 +54,13 @@ def parser_by_len(length):
             sequences_text = response.text.split('\n\n')[:-1]
             for b in sequences_text:
                 c = b.split('\n')
-                s = c[1] + c[2]
+                s = c[1]
                 if s not in seq_list and set(s).issubset(aa_set):
                     seq_list.append(s)
         else:
             print(f"Failed to fetch sequences length={length}: {response.status_code} - {response.reason}")
 
-    with open(f"data/pkl_from_parser_prl/seq_{length}_{len(seq_list)}.pkl", 'wb') as f:
+    with open(f"data/pkl_from_parser_prl_5_40/seq_{length}_{len(seq_list)}.pkl", 'wb') as f:
         pickle.dump(seq_list, f)
 
 
@@ -66,6 +68,6 @@ func_out = Parallel(n_jobs=2)(
     [
         delayed(parser_by_len)(
             length
-        ) for length in range(71, 97, 1)
+        ) for length in range(5, 40, 1)
     ]
 )
