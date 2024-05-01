@@ -19,13 +19,26 @@ def read_all_from_dir(folder):
     return full_sequence_in_folder
 
 
+def clay_two_files():
+    with open(f"data/seq_40_less.pkl", "rb") as input_file:
+        seq_40_less = pickle.load(input_file)
+
+    with open(f"data/seq_40_more.pkl", "rb") as input_file:
+        seq_40_more = pickle.load(input_file)
+    seq_96 = seq_40_less + seq_40_more
+    with open(f"data/seq_96.pkl", 'wb') as f:
+        pickle.dump(seq_96, f)
+
+
 if __name__ == "__main__":
-    before_60 = read_all_from_dir('pkl_from_parser')
-    print('len(before_60):', len(before_60))
-    more_60 = read_all_from_dir('pkl_from_parser_prl')
-    print('len(more_60):', len(more_60))
-    more_40_list = before_60 + more_60
-    print('len(all):', len(more_40_list))
-    with open(f"data/seq_40_more.pkl", 'wb') as f:
-        pickle.dump(more_40_list, f)
-    print('ok')
+    # before_60 = read_all_from_dir('pkl_from_parser')
+    # print('len(before_60):', len(before_60))
+    # more_60 = read_all_from_dir('pkl_from_parser_prl')
+    # print('len(more_60):', len(more_60))
+    # more_40_list = before_60 + more_60
+    # print('len(all):', len(more_40_list))
+    # with open(f"data/seq_40_more.pkl", 'wb') as f:
+    #     pickle.dump(more_40_list, f)
+    # print('ok')
+
+    clay_two_files()
