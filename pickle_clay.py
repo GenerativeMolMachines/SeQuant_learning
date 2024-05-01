@@ -4,7 +4,7 @@ import os
 
 def clay_pkl_files(folder_name, file_name):
     path = os.path.join('data/', folder_name, file_name)
-    with open(f"data/{path}", "rb") as input_file:
+    with open(f"{path}", "rb") as input_file:
         one_len_list = pickle.load(input_file)
     return one_len_list
 
