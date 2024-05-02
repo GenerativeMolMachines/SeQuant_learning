@@ -15,8 +15,8 @@ aa_set = {'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L',
 def parser_by_len(length):
     search_params = {
         "db": "protein",
-        "term": f"({length}[SLEN] AND ((animals[filter] OR bacteria[filter]))",
-        "retmax": 250000,  # Adjust retmax as needed
+        "term": f"{length}[SLEN]",
+        "retmax": 350000,  # Adjust retmax as needed
         "retmode": "json"
     }
     response = requests.get(search_url, params=search_params)
@@ -34,8 +34,8 @@ def parser_by_len(length):
         return
 
     id_list = search_results["esearchresult"]["idlist"]
-
-    several_id_lists = np.array_split(np.asarray(id_list), 5000)
+    print(len(id_list))
+    several_id_lists = np.array_split(np.asarray(id_list), 7000)
     seq_list = []
     # Step 2: Fetch the sequences using the IDs
     for id_l in several_id_lists:
@@ -71,3 +71,5 @@ func_out = Parallel(n_jobs=2)(
         ) for length in range(5, 40, 1)
     ]
 )
+for length in range(5, 40, 1):
+    parser_by_len(length)
