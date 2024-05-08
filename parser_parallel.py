@@ -48,7 +48,11 @@ def parser_by_len(length):
             "rettype": "fasta",
             "retmode": "text"
         }
-        response = requests.get(fetch_url, params=fetch_params)
+
+        try:
+            response = requests.get(fetch_url, params=fetch_params)
+        except:
+            continue
 
         if response.ok:
             sequences_text = response.text.split('\n\n')[:-1]
@@ -68,8 +72,6 @@ func_out = Parallel(n_jobs=2)(
     [
         delayed(parser_by_len)(
             length
-        ) for length in range(5, 40, 1)
+        ) for length in [32, 37, 38]
     ]
 )
-for length in range(5, 40, 1):
-    parser_by_len(length)
