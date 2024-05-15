@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 aa_set = {'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L',
     'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'Y'}
 
-with open(r"data/seq_96.pkl", "rb") as input_file:
+with open(r"data/seq_96_all.pkl", "rb") as input_file:
     all_seqs_full = pickle.load(input_file)
 df = pd.DataFrame()
 df['s'] = all_seqs_full
@@ -36,10 +36,10 @@ test_distr.to_csv(f"test_distr_{rand_st}.csv")
 train_distr.to_csv(f"train_distr_{rand_st}.csv")
 
 train_seq_ = train['s'].to_list()
-with open('train_seq_.pkl', 'wb') as f:
+with open('train_seq_clean.pkl', 'wb') as f:
     pickle.dump(train_seq_, f)
 del train_seq_
 
 test_seq_ = test['s'].to_list()
-with open('test_seq_.pkl', 'wb') as f:
+with open('test_seq_clean_.pkl', 'wb') as f:
     pickle.dump(test_seq_, f)
