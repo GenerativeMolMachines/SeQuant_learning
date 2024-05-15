@@ -34,6 +34,7 @@ def select_folder():
     print('1. sequential')
     print('2. parallel')
     print('3. seq_40_more')
+    print('4. seq_40_less')
     folder_choise = input()
     if int(folder_choise) == 1:
         path += 'pkl_from_parser/'
@@ -51,6 +52,10 @@ def select_folder():
         print('0', already_exist[0])
         print('len -1', len(already_exist[-1]))
         print('-1', already_exist[-1])
+    elif int(folder_choise) == 4:
+        path += 'pkl_from_parser_prl_5_40/'
+        path += select_file(path)
+        check_seq_list(path)
     else:
         print('no option exists')
         return
