@@ -50,16 +50,16 @@ def clay_files_one_len(len_):
         pickle.dump(list_to_save, f)
 
 if __name__ == "__main__":
-    for i in [17, 18, 19, 20, 21, 38]:
-        clay_files_one_len(i)
-    # before_60 = read_all_from_dir('pkl_from_parser')
-    # print('len(before_60):', len(before_60))
+    # for i in [17, 18, 19, 20, 21, 38]:
+    #     clay_files_one_len(i)
+    before_60 = read_all_from_dir('pkl_from_parser_prl_5_40')
+    print('len(here):', len(before_60))
     # more_60 = read_all_from_dir('pkl_from_parser_prl')
     # print('len(more_60):', len(more_60))
     # more_40_list = before_60 + more_60
     # print('len(all):', len(more_40_list))
-    # with open(f"data/seq_40_more.pkl", 'wb') as f:
-    #     pickle.dump(more_40_list, f)
-    # print('ok')
+    with open(f"data/seq_40_less.pkl", 'wb') as f:
+        pickle.dump(before_60, f)
+    print('ok')
 
     # clay_two_files()
