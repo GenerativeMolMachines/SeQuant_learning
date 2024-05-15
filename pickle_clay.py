@@ -39,8 +39,10 @@ def clay_files_one_len(len_):
     for file in files:
         if file.startswith(f"seq_{len_}"):
             seq_one_len_list.append(file)
+    print(seq_one_len_list)
     for file_name in seq_one_len_list:
         list_to_append = open_pkl_files(folder_name, file_name)
+        print(len(list_to_append))
         for seq in list_to_append:
             if seq not in list_to_save:
                 list_to_save.append(seq)
@@ -48,7 +50,8 @@ def clay_files_one_len(len_):
         pickle.dump(list_to_save, f)
 
 if __name__ == "__main__":
-    clay_files_one_len(12)
+    for i in [17, 18, 19, 20, 21, 38]:
+        clay_files_one_len(i)
     # before_60 = read_all_from_dir('pkl_from_parser')
     # print('len(before_60):', len(before_60))
     # more_60 = read_all_from_dir('pkl_from_parser_prl')
