@@ -49,10 +49,10 @@ tf.random.set_seed(2022)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 # Loading balanced dataset
-with open('data/test_seq_clean_.pkl', 'rb') as f:
+with open('data/test_seq_clean_str.pkl', 'rb') as f:
     test_data = pickle.load(f)
 
-with open('data/train_seq_clean.pkl', 'rb') as f:
+with open('data/train_seq_clean_str.pkl', 'rb') as f:
     train_data = pickle.load(f)
 
 # Use functions
