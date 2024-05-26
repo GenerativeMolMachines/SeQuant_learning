@@ -22,29 +22,29 @@ def make_monomer_descriptors(monomer_dict: dict[str, str]) -> pd.DataFrame:
     scaled_array = sc.fit_transform(descriptors_set)
     descriptors_set = pd.DataFrame(scaled_array, columns=descriptor_names, index=monomer_dict.keys())
 
-    energy_data = pd.read_csv('data/final_energy_set.csv')
-    energy_set = energy_data.set_index("Aminoacid").iloc[:, :]
-
-    energy_names = energy_set.columns
-
-    scaled_energy = sc.fit_transform(energy_set)
-    scaled_energy_set = pd.DataFrame(scaled_energy, columns=energy_names, index=monomer_dict.keys())
-    scaled_energy_set.loc['water'].fillna(-1, inplace=True)
-
-    all_descriptors = pd.concat([descriptors_set, scaled_energy_set], axis=1)
-    return all_descriptors
+    return descriptors_set
 
 
 def seq_to_matrix(
     sequence: str,
     descriptors: pd.DataFrame,
-    num: int
+    num: int,
+    polymer_type: str
 ):
     rows = descriptors.shape[1]
     seq_matrix = np.empty((0, rows), float)  # shape (0,rows)
-    for aa in sequence:
-        descriptors_array = np.array(descriptors.loc[aa]).reshape((1, rows))  # shape (1,rows)
-        seq_matrix = np.append(seq_matrix, descriptors_array, axis=0)
+    if polymer_type == 'protein':
+        for aa in sequence:
+            descriptors_array = np.array(descriptors.loc[aa]).reshape((1, rows))  # shape (1,rows)
+            seq_matrix = np.append(seq_matrix, descriptors_array, axis=0)
+    elif polymer_type == 'DNA':
+        for aa in sequence:
+            descriptors_array = np.array(descriptors.loc['d'+aa]).reshape((1, rows))  # shape (1,rows)
+            seq_matrix = np.append(seq_matrix, descriptors_array, axis=0)
+    elif polymer_type == 'RNA':
+        for aa in sequence:
+            descriptors_array = np.array(descriptors.loc['r'+aa]).reshape((1, rows))  # shape (1,rows)
+            seq_matrix = np.append(seq_matrix, descriptors_array, axis=0)
     seq_matrix = seq_matrix.T
     shape = seq_matrix.shape[1]
     if shape < num:
@@ -64,12 +64,13 @@ def seq_to_matrix(
 def encode_seqs(
     sequences_list: list[str],
     descriptors: pd.DataFrame,
-    num: int
+    num: int,
+    polymer_type: str
 ):
     lst = []
     i = 0
     for sequence in tqdm(sequences_list):
-        seq_matrix = seq_to_matrix(sequence=sequence, descriptors=descriptors, num=num)
+        seq_matrix = seq_to_matrix(sequence=sequence, descriptors=descriptors, num=num, polymer_type=polymer_type)
         lst.append(seq_matrix)
         i += 1
     encoded_seqs = np.dstack(lst)
