@@ -70,44 +70,46 @@ tf.keras.backend.clear_session()
 tf.random.set_seed(2022)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-# Loading balanced dataset
-with open('data/test_seq_clean_str.pkl', 'rb') as f:
-    test_data = pickle.load(f)
+# Loading balanced datasets
+dna_train = list(pd.read_csv('data/dna_rna/dna_train.csv'))
+dna_test = list(pd.read_csv('data/dna_rna/dna_test.csv'))
 
-with open('data/train_seq_clean_str.pkl', 'rb') as f:
-    train_data = pickle.load(f)
+rna_train = list(pd.read_csv('data/dna_rna/rna_train.csv'))
+rna_test = list(pd.read_csv('data/dna_rna/rna_test.csv'))
 
-# Use functions for protein datasets
-descriptors_set = make_monomer_descriptors(monomer_dict)
-
-test_encoded_sequences = encode_seqs(test_data, descriptors_set, max_len, polymer_type='protein')
-test_encoded_sequences = np.moveaxis(test_encoded_sequences, -1, 0)
-
-train_encoded_sequences = encode_seqs(train_data, descriptors_set, max_len, polymer_type='protein')
-train_encoded_sequences = np.moveaxis(train_encoded_sequences, -1, 0)
+protein_train = list(pd.read_csv('data/dna_rna/protein_train.csv'))
+protein_test = list(pd.read_csv('data/dna_rna/protein_test.csv'))
 
 # Use functions for DNA datasets
-test_encoded_sequences = encode_seqs(test_data, descriptors_set, max_len, polymer_type='DNA')
-test_encoded_sequences = np.moveaxis(test_encoded_sequences, -1, 0)
+descriptors_set = make_monomer_descriptors(monomer_dict)
 
-train_encoded_sequences = encode_seqs(train_data, descriptors_set, max_len, polymer_type='DNA')
-train_encoded_sequences = np.moveaxis(train_encoded_sequences, -1, 0)
+dna_train_encoded_sequences = encode_seqs(dna_train, descriptors_set, max_len, polymer_type='DNA')
+dna_train_encoded_sequences = np.moveaxis(dna_train_encoded_sequences, -1, 0)
+
+dna_test_encoded_sequences = encode_seqs(dna_test, descriptors_set, max_len, polymer_type='DNA')
+dna_test_encoded_sequences = np.moveaxis(dna_test_encoded_sequences, -1, 0)
 
 # Use functions for RNA datasets
+rna_train_encoded_sequences = encode_seqs(rna_train, descriptors_set, max_len, polymer_type='RNA')
+rna_train_encoded_sequences = np.moveaxis(rna_train_encoded_sequences, -1, 0)
 
-test_encoded_sequences = encode_seqs(test_data, descriptors_set, max_len, polymer_type='RNA')
-test_encoded_sequences = np.moveaxis(test_encoded_sequences, -1, 0)
+rna_test_encoded_sequences = encode_seqs(rna_test, descriptors_set, max_len, polymer_type='RNA')
+rna_test_encoded_sequences = np.moveaxis(rna_test_encoded_sequences, -1, 0)
 
-train_encoded_sequences = encode_seqs(train_data, descriptors_set, max_len, polymer_type='RNA')
-train_encoded_sequences = np.moveaxis(train_encoded_sequences, -1, 0)
+# Use functions for protein datasets
+protein_train_encoded_sequences = encode_seqs(protein_train, descriptors_set, max_len, polymer_type='protein')
+protein_train_encoded_sequences = np.moveaxis(protein_train_encoded_sequences, -1, 0)
+
+protein_test_encoded_sequences = encode_seqs(protein_test, descriptors_set, max_len, polymer_type='protein')
+protein_test_encoded_sequences = np.moveaxis(protein_test_encoded_sequences, -1, 0)
 
 # check if transformation is correct
 assert np.all(
     seq_to_matrix(
-        sequence=test_data[0],
+        sequence=protein_test[0],
         descriptors=descriptors_set,
         num=max_len
-    ) == test_encoded_sequences[0, :, :]
+    ) == protein_test_encoded_sequences[0, :, :]
 )
 
 # model init
@@ -120,7 +122,7 @@ autoencoder = autoencoder_model(
 )
 
 # set checkpoint
-checkpoint_filepath = 'checkpoint/checkpoint_optimal'
+checkpoint_filepath = 'checkpoint/checkpoint_all_polymers'
 model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
     filepath=checkpoint_filepath,
     save_weights_only=False,
@@ -131,9 +133,12 @@ model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
 
 early_stop = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3)
 
-# Training - add RNA and DNA
-X_train = preprocess_input(train_encoded_sequences)
-X_test = preprocess_input(test_encoded_sequences)
+# Training
+X_train = np.hstack([dna_train_encoded_sequences, rna_train_encoded_sequences, protein_train_encoded_sequences])
+X_train = preprocess_input(X_train)
+
+X_test = np.hstack([dna_test_encoded_sequences, rna_test_encoded_sequences, protein_test_encoded_sequences])
+X_test = preprocess_input(X_test)
 
 history = autoencoder.fit(
     X_train,
@@ -144,12 +149,12 @@ history = autoencoder.fit(
     callbacks=[early_stop, model_checkpoint_callback]
 )
 
-with open('trainHistoryDict/optimal_trainHistoryDict' + str(num_seq) + '_maxlen' + str(max_len) + '_' + str(
+with open('trainHistoryDict/all_polymers_trainHistoryDict' + str(num_seq) + '_maxlen' + str(max_len) + '_' + str(
         pad) + 'pad_alldescs_norm-1to1_batch' + str(batch_size) + '_lr' + str(learning_rate), 'wb') as file_pi:
     pickle.dump(history.history, file_pi)
 
 # load model learning history
-with open('trainHistoryDict/optimal_trainHistoryDict' + str(num_seq) + '_maxlen' + str(max_len) + '_' + str(
+with open('trainHistoryDict/all_polymers_trainHistoryDict' + str(num_seq) + '_maxlen' + str(max_len) + '_' + str(
         pad) + 'pad_alldescs_norm-1to1_batch' + str(batch_size) + '_lr' + str(learning_rate), 'rb') as f:
     learning_history = pickle.load(f)
 
@@ -164,6 +169,6 @@ plt.yticks(np.arange(0, 0.1, 0.005))
 plt.title("Autoencoder learning")
 
 plt.legend()
-plt.savefig('figures/optimal.png')
+plt.savefig('figures/all_polymers.png')
 
 print("--- %s seconds ---" % (time.time() - start_time))
