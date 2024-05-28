@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import pickle
 from sklearn.model_selection import train_test_split
+from autoencoder_preset_tools import filter_sequences
 
 # Variables
 np.random.seed(2024)
@@ -9,14 +10,47 @@ n_samples = 1200
 start_length = 14
 end_length = 96
 
+dna_dict = {
+    'A': r'O=P(O)(O)OP(=O)(O)OP(=O)(O)OC[C@H]3O[C@@H](n2cnc1c(ncnc12)N)C[C@@H]3O',  # DNA
+    'T': r'CC1=CN(C(=O)NC1=O)C2CC(C(O2)COP(=O)(O)OP(=O)(O)OP(=O)(O)O)O',
+    'G': r'O=P(O)(O)OP(=O)(O)OP(=O)(O)OC[C@H]3O[C@@H](n1cnc2c1NC(=N/C2=O)\N)C[C@@H]3O',
+    'C': r'C1[C@@H]([C@H](O[C@H]1N2C=CC(=NC2=O)N)CO[P@@](=O)(O)O[P@@](=O)(O)OP(=O)(O)O)O',
+}
+
+rna_dict = {
+    'A': r'c1nc(c2c(n1)n(cn2)[C@H]3[C@@H]([C@@H]([C@H](O3)COP(=O)(O)OP(=O)(O)OP(=O)(O)O)O)O)N',  # RNA
+    'U': r'C1=CN(C(=O)NC1=O)C2C(C(C(O2)COP(=O)([O-])OP(=O)([O-])OP(=O)([O-])[O-])O)O',
+    'G': r'C1=NC2=C(N1C3C(C(C(O3)COP(=O)(O)OP(=O)(O)OP(=O)(O)O)O)O)N=C(NC2=O)N',
+    'C': r'c1cn(c(=O)nc1N)[C@H]2[C@@H]([C@@H]([C@H](O2)CO[P@](=O)(O)O[P@](=O)(O)OP(=O)(O)O)O)O'
+}
+
+protein_dict = {
+    'A': 'CC(C(=O)O)N',  # protein
+    'R': 'C(CC(C(=O)O)N)CN=C(N)N', 'N': 'C(C(C(=O)O)N)C(=O)N', 'D': 'C(C(C(=O)O)N)C(=O)O', 'C': 'C(C(C(=O)O)N)S',
+    'Q': 'C(CC(=O)N)C(C(=O)O)N', 'E': 'C(CC(=O)O)C(C(=O)O)N', 'G': 'C(C(=O)O)N',
+    'H': 'C1=C(NC=N1)CC(C(=O)O)N', 'I': 'CCC(C)C(C(=O)O)N', 'L': 'CC(C)CC(C(=O)O)N',
+    'K': 'C(CCN)CC(C(=O)O)N', 'M': 'CSCCC(C(=O)O)N', 'F': 'C1=CC=C(C=C1)CC(C(=O)O)N', 'P': 'C1CC(NC1)C(=O)O',
+    'S': 'C(C(C(=O)O)N)O', 'T': 'CC(C(C(=O)O)N)O', 'W': 'C1=CC=C2C(=C1)C(=CN2)CC(C(=O)O)N',
+    'Y': 'C1=CC(=CC=C1CC(C(=O)O)N)O', 'V': 'CC(C)C(C(=O)O)N', 'O': 'CC1CC=NC1C(=O)NCCCCC(C(=O)O)N',
+    'U': 'C(C(C(=O)O)N)[Se]'
+}
+
 # Import data
 dna_df = pd.read_csv('dna_rna/sequences DNA.txt', header=None)
 rna_df = pd.read_csv('dna_rna/sequences RNA.txt', header=None)
+protein = pd.read_csv('dna_rna/prot_14_to_96.csv')
+
+# Filtering sequences
+dna_df = filter_sequences(sequences=dna_df[0].tolist(), known_symbols=dna_dict)
+rna_df = filter_sequences(sequences=rna_df[0].tolist(), known_symbols=dna_dict)
+protein = filter_sequences(sequences=protein['seq'].tolist(), known_symbols=protein_dict)
+
+dna_df = pd.DataFrame(dna_df)
+rna_df = pd.DataFrame(rna_df)
+protein = pd.DataFrame(protein)
 
 dna_df.columns = ['sequence']
 rna_df.columns = ['sequence']
-
-protein = pd.read_csv('dna_rna/prot_14_to_96.csv')
 protein.columns = ['sequence']
 
 

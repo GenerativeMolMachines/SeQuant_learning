@@ -71,36 +71,36 @@ tf.random.set_seed(2022)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 # Loading balanced datasets
-dna_train = list(pd.read_csv('data/dna_rna/dna_train.csv'))
-dna_test = list(pd.read_csv('data/dna_rna/dna_test.csv'))
+dna_train = pd.read_csv('data/dna_rna/dna_train.csv')
+dna_test = pd.read_csv('data/dna_rna/dna_test.csv')
 
-rna_train = list(pd.read_csv('data/dna_rna/rna_train.csv'))
-rna_test = list(pd.read_csv('data/dna_rna/rna_test.csv'))
+rna_train = pd.read_csv('data/dna_rna/rna_train.csv')
+rna_test = pd.read_csv('data/dna_rna/rna_test.csv')
 
-protein_train = list(pd.read_csv('data/dna_rna/protein_train.csv'))
-protein_test = list(pd.read_csv('data/dna_rna/protein_test.csv'))
+protein_train = pd.read_csv('data/dna_rna/protein_train.csv')
+protein_test = pd.read_csv('data/dna_rna/protein_test.csv')
 
 # Use functions for DNA datasets
 descriptors_set = make_monomer_descriptors(monomer_dict)
 
-dna_train_encoded_sequences = encode_seqs(dna_train, descriptors_set, max_len, polymer_type='DNA')
+dna_train_encoded_sequences = encode_seqs(dna_train['sequence'], descriptors_set, max_len, polymer_type='DNA')
 dna_train_encoded_sequences = np.moveaxis(dna_train_encoded_sequences, -1, 0)
 
-dna_test_encoded_sequences = encode_seqs(dna_test, descriptors_set, max_len, polymer_type='DNA')
+dna_test_encoded_sequences = encode_seqs(dna_test['sequence'].tolist(), descriptors_set, max_len, polymer_type='DNA')
 dna_test_encoded_sequences = np.moveaxis(dna_test_encoded_sequences, -1, 0)
 
 # Use functions for RNA datasets
-rna_train_encoded_sequences = encode_seqs(rna_train, descriptors_set, max_len, polymer_type='RNA')
+rna_train_encoded_sequences = encode_seqs(rna_train['sequence'].tolist(), descriptors_set, max_len, polymer_type='RNA')
 rna_train_encoded_sequences = np.moveaxis(rna_train_encoded_sequences, -1, 0)
 
-rna_test_encoded_sequences = encode_seqs(rna_test, descriptors_set, max_len, polymer_type='RNA')
+rna_test_encoded_sequences = encode_seqs(rna_test['sequence'].tolist(), descriptors_set, max_len, polymer_type='RNA')
 rna_test_encoded_sequences = np.moveaxis(rna_test_encoded_sequences, -1, 0)
 
 # Use functions for protein datasets
-protein_train_encoded_sequences = encode_seqs(protein_train, descriptors_set, max_len, polymer_type='protein')
+protein_train_encoded_sequences = encode_seqs(protein_train['sequence'].tolist(), descriptors_set, max_len, polymer_type='protein')
 protein_train_encoded_sequences = np.moveaxis(protein_train_encoded_sequences, -1, 0)
 
-protein_test_encoded_sequences = encode_seqs(protein_test, descriptors_set, max_len, polymer_type='protein')
+protein_test_encoded_sequences = encode_seqs(protein_test['sequence'].tolist(), descriptors_set, max_len, polymer_type='protein')
 protein_test_encoded_sequences = np.moveaxis(protein_test_encoded_sequences, -1, 0)
 
 # check if transformation is correct
