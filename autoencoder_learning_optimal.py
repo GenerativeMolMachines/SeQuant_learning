@@ -109,7 +109,8 @@ assert np.all(
     seq_to_matrix(
         sequence=protein_test_list[0],
         descriptors=descriptors_set,
-        num=max_len
+        num=max_len,
+        polymer_type='protein'
     ) == protein_test_encoded_sequences[0, :, :]
 )
 
