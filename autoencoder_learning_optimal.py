@@ -104,9 +104,10 @@ protein_test_encoded_sequences = encode_seqs(protein_test['sequence'].tolist(), 
 protein_test_encoded_sequences = np.moveaxis(protein_test_encoded_sequences, -1, 0)
 
 # check if transformation is correct
+protein_test_list = protein_test['sequence'].tolist()
 assert np.all(
     seq_to_matrix(
-        sequence=protein_test[0],
+        sequence=protein_test_list[0],
         descriptors=descriptors_set,
         num=max_len
     ) == protein_test_encoded_sequences[0, :, :]
