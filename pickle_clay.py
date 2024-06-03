@@ -20,13 +20,20 @@ def read_all_from_dir(folder):
 
 
 def clay_two_files():
-    with open(f"data/seq_40_less.pkl", "rb") as input_file:
-        seq_40_less = pickle.load(input_file)
+    with open(f"rna_10.pkl", "rb") as input_file:
+        dna_5 = pickle.load(input_file)
 
-    with open(f"data/seq_40_more.pkl", "rb") as input_file:
-        seq_40_more = pickle.load(input_file)
-    seq_96 = seq_40_less + seq_40_more
-    with open(f"data/seq_96.pkl", 'wb') as f:
+    with open(f"rna_11.pkl", "rb") as input_file:
+        dna_6 = pickle.load(input_file)
+
+    with open(f"rna_12.pkl", "rb") as input_file:
+        dna_7 = pickle.load(input_file)
+
+    with open(f"rna_13.pkl", "rb") as input_file:
+        dna_8 = pickle.load(input_file)
+    seq_96 = dna_5 + dna_6 + dna_7 + dna_8
+
+    with open(f"data/rna_10_till_13.pkl", 'wb') as f:
         pickle.dump(seq_96, f)
 
 
@@ -52,14 +59,14 @@ def clay_files_one_len(len_):
 if __name__ == "__main__":
     # for i in [17, 18, 19, 20, 21, 38]:
     #     clay_files_one_len(i)
-    before_60 = read_all_from_dir('pkl_from_parser_prl_5_40')
-    print('len(here):', len(before_60))
-    # more_60 = read_all_from_dir('pkl_from_parser_prl')
-    # print('len(more_60):', len(more_60))
-    # more_40_list = before_60 + more_60
-    # print('len(all):', len(more_40_list))
-    with open(f"data/seq_40_less.pkl", 'wb') as f:
-        pickle.dump(before_60, f)
-    print('ok')
-
+    # before_60 = read_all_from_dir('pkl_from_parser_prl_5_40')
+    # print('len(here):', len(before_60))
+    # # more_60 = read_all_from_dir('pkl_from_parser_prl')
+    # # print('len(more_60):', len(more_60))
+    # # more_40_list = before_60 + more_60
+    # # print('len(all):', len(more_40_list))
+    # with open(f"data/seq_40_less.pkl", 'wb') as f:
+    #     pickle.dump(before_60, f)
+    # print('ok')
+    open_pkl_files('', 'prot_all.pkl')
     # clay_two_files()
