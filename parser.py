@@ -13,11 +13,11 @@ fetch_url = base_url + "efetch.fcgi"
 aa_set = {'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L',
               'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'Y'}
 # Step 1: Perform the search to get the IDs of matching sequences
-for length in [5, 6, 7, 8, 9, 10, 11, 12, 13]:
+for length in [88, 90]:
     search_params = {
-        "db": "nucleotide",
-        "term": f"biomol_genomic[PROP] AND {length}[SLEN]",
-        "retmax": 100,  # Adjust retmax as needed
+        "db": "protein",
+        "term": f"{length}[SLEN]",
+        "retmax": 300000,  # Adjust retmax as needed
         "retmode": "json"
     }
     response = requests.get(search_url, params=search_params)
@@ -33,15 +33,15 @@ for length in [5, 6, 7, 8, 9, 10, 11, 12, 13]:
 
     id_list = search_results["esearchresult"]["idlist"]
 
-    several_id_lists = np.array_split(np.asarray(id_list), 2)
+    several_id_lists = np.array_split(np.asarray(id_list), 6000)
     seq_list = []
     # Step 2: Fetch the sequences using the IDs
     for id_l in several_id_lists:
-        if len(seq_list) > 10:
+        if len(seq_list) >= 1200:
             print('more then break')
             break
         fetch_params = {
-            "db": "nucleotide",
+            "db": "protein",
             "id": ",".join(list(id_l)),
             "rettype": "fasta",
             "retmode": "text"
@@ -60,7 +60,7 @@ for length in [5, 6, 7, 8, 9, 10, 11, 12, 13]:
         else:
             print(f"Failed to fetch sequences length={length}: {response.status_code} - {response.reason}")
 
-    with open(f"data/pkl_from_parser_prl_5_40/seq_{length}_{len(seq_list)}.pkl", 'wb') as f:
+    with open(f"data/pkl_from_parser_prl/seq_{length}_{len(seq_list)}.pkl", 'wb') as f:
         pickle.dump(seq_list, f)
 
 
