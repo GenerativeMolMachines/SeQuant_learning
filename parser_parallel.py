@@ -58,7 +58,7 @@ def parser_by_len(length):
             sequences_text = response.text.split('\n\n')[:-1]
             for b in sequences_text:
                 c = b.split('\n')
-                s = c[1]
+                s = c[1] + c[2]
                 if s not in seq_list and set(s).issubset(aa_set):
                     seq_list.append(s)
         else:
