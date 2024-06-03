@@ -21,10 +21,33 @@ def sts_clay(folders):
     return train, test
 
 
-if __name__ == "__main__":
-    train_l, test_l = sts_clay(['pkl_from_parser_prl_5_40', 'pkl_from_parser', 'pkl_from_parser_prl'])
-    with open(f"data/train_prot_for_masha.pkl", 'wb') as f:
-        pickle.dump(train_l, f)
+def str_from_files(files):
+    test = []
+    train = []
+    for file in files:
+        path = os.path.join(file)
+        with open(f"{path}", "rb") as input_file:
+            one_len_list = pickle.load(input_file)
+        test_one_len = random.sample(one_len_list, int(len(one_len_list)*0.3))
+        train_one_len = list(set(one_len_list) - set(test_one_len))
+        print(f"for len={len(train_one_len[0])} test_len = {len(test_one_len)}, train_len = {len(train_one_len)}")
+        test.extend(test_one_len)
+        train.extend(train_one_len)
+    return train, test
 
-    with open(f"data/test_prot_for_masha.pkl", 'wb') as f:
+if __name__ == "__main__":
+    train_l, test_l = str_from_files(['rna_10.pkl', 'rna_11.pkl', 'rna_12.pkl', 'rna_13.pkl',
+                                      'dna_5.pkl', 'dna_6.pkl', 'dna_7.pkl', 'dna_8.pkl'])
+    with open(f"test_prot_for_masha.pkl", "rb") as input_file:
+        test_prot = pickle.load(input_file)
+    with open(f"train_prot_for_masha.pkl", "rb") as input_file:
+        train_prot = pickle.load(input_file)
+
+    train_l.extend(train_prot)
+    test_l.extend(test_prot)
+
+    with open(f"test_prot_full_dna_10_till_13_rna_5_till_8.pkl", 'wb') as f:
         pickle.dump(test_l, f)
+
+    with open(f"train_prot_full_dna_10_till_13_rna_5_till_8.pkl", 'wb') as f:
+        pickle.dump(train_l, f)

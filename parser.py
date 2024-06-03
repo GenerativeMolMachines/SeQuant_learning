@@ -2,6 +2,10 @@ import pickle
 import requests
 import numpy as np
 
+from Bio import SeqIO
+from io import StringIO
+
+
 
 base_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
 search_url = base_url + "esearch.fcgi"
@@ -9,11 +13,11 @@ fetch_url = base_url + "efetch.fcgi"
 aa_set = {'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L',
               'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'Y'}
 # Step 1: Perform the search to get the IDs of matching sequences
-for length in [12, 17, 18, 19, 20, 21, 38]:
+for length in [5, 6, 7, 8, 9, 10, 11, 12, 13]:
     search_params = {
-        "db": "protein",
-        "term": f"{length}[SLEN]",
-        "retmax": 450000,  # Adjust retmax as needed
+        "db": "nucleotide",
+        "term": f"biomol_genomic[PROP] AND {length}[SLEN]",
+        "retmax": 100,  # Adjust retmax as needed
         "retmode": "json"
     }
     response = requests.get(search_url, params=search_params)
@@ -29,15 +33,15 @@ for length in [12, 17, 18, 19, 20, 21, 38]:
 
     id_list = search_results["esearchresult"]["idlist"]
 
-    several_id_lists = np.array_split(np.asarray(id_list), 9000)
+    several_id_lists = np.array_split(np.asarray(id_list), 2)
     seq_list = []
     # Step 2: Fetch the sequences using the IDs
     for id_l in several_id_lists:
-        if len(seq_list) > 80000:
+        if len(seq_list) > 10:
             print('more then break')
             break
         fetch_params = {
-            "db": "protein",
+            "db": "nucleotide",
             "id": ",".join(list(id_l)),
             "rettype": "fasta",
             "retmode": "text"
