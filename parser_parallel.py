@@ -16,7 +16,7 @@ def parser_by_len(length):
     search_params = {
         "db": "protein",
         "term": f"{length}[SLEN]",
-        "retmax": 100000,  # Adjust retmax as needed
+        "retmax": 400000,  # Adjust retmax as needed
         "retmode": "json"
     }
     response = requests.get(search_url, params=search_params)
@@ -35,11 +35,11 @@ def parser_by_len(length):
 
     id_list = search_results["esearchresult"]["idlist"]
     print(len(id_list))
-    several_id_lists = np.array_split(np.asarray(id_list), 2000)
+    several_id_lists = np.array_split(np.asarray(id_list), 9000)
     seq_list = []
     # Step 2: Fetch the sequences using the IDs
     for id_l in several_id_lists:
-        if len(seq_list) > 1200:
+        if len(seq_list) > 80000:
             print('more then break')
             break
         fetch_params = {

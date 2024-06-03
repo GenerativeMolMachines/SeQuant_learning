@@ -3,7 +3,7 @@ import pickle
 import gzip
 # from joblib import Parallel, delayed
 
-aa_set = {'A', 'C', 'G', 'U'}
+aa_set = {'A', 'C', 'G', 'T'}
 
 def make_pickle_files(
     sequence_files_name: list,
@@ -29,42 +29,43 @@ def make_pickle_files(
 
 
 def read_fasta_file(file_path):
-    sequences_10 = []
-    sequences_11 = []
-    sequences_12 = []
-    sequences_13 = []
-    with gzip.open("data/RNA_AND_length5_TO_13_AND_entry_typeSequence.fasta.gz", "rt") as handle:
+    # sequences_10 = []
+    # sequences_11 = []
+    # sequences_12 = []
+    sequences_14 = []
+    with gzip.open("length14_TO_14_AND_entry_typeSequence.fasta.gz", "rt") as handle:
         for record in SeqIO.parse(handle, "fasta"):
                 seq = str(record.seq)
                 if set(seq).issubset(aa_set):
-                    if len(seq) == 10 and seq not in sequences_10:
-                        if len(sequences_10) > 1200:
-                            continue
-                        sequences_10.append(seq)
-                    elif len(seq) == 11 and seq not in sequences_11:
-                        if len(sequences_11) > 1200:
-                            continue
-                        sequences_11.append(seq)
-                    elif len(seq) == 12 and seq not in sequences_12:
-                        if len(sequences_12) > 1200:
-                            continue
-                        sequences_12.append(seq)
-                    elif len(seq) == 13 and seq not in sequences_13:
-                        if len(sequences_13) > 1200:
-                            continue
-                        sequences_13.append(seq)
-    with open("rna_10.pkl", 'wb') as f:
-        pickle.dump(sequences_10, f)
+                    if len(seq) == 14 and seq not in sequences_14:
+                        if len(sequences_14) >= 1200:
+                            break
+                        sequences_14.append(seq)
+                    # elif len(seq) == 11 and seq not in sequences_11:
+                    #     if len(sequences_11) > 1200:
+                    #         continue
+                    #     sequences_11.append(seq)
+                    # elif len(seq) == 12 and seq not in sequences_12:
+                    #     if len(sequences_12) > 1200:
+                    #         continue
+                    #     sequences_12.append(seq)
+                    # elif len(seq) == 13 and seq not in sequences_13:
+                    #     if len(sequences_13) > 1200:
+                    #         continue
+                    #     sequences_13.append(seq)
+    print(len(sequences_14))
+    with open("rna_14.pkl", 'wb') as f:
+        pickle.dump(sequences_14, f)
 
-    with open("rna_11.pkl", 'wb') as f:
-        pickle.dump(sequences_11, f)
-    with open("rna_12.pkl", 'wb') as f:
-        pickle.dump(sequences_12, f)
+    # with open("rna_11.pkl", 'wb') as f:
+    #     pickle.dump(sequences_11, f)
+    # with open("rna_12.pkl", 'wb') as f:
+    #     pickle.dump(sequences_12, f)
+    #
+    # with open("rna_13.pkl", 'wb') as f:
+    #     pickle.dump(sequences_13, f)
 
-    with open("rna_13.pkl", 'wb') as f:
-        pickle.dump(sequences_13, f)
-
-    return sequences_13
+    return
 
 
 
