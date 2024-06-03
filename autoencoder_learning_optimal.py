@@ -136,10 +136,12 @@ model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
 early_stop = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3)
 
 # Training
-X_train = np.hstack([dna_train_encoded_sequences, rna_train_encoded_sequences, protein_train_encoded_sequences])
+X_train = np.concatenate(
+    (dna_train_encoded_sequences, rna_train_encoded_sequences, protein_train_encoded_sequences), axis=0)
 X_train = preprocess_input(X_train)
 
-X_test = np.hstack([dna_test_encoded_sequences, rna_test_encoded_sequences, protein_test_encoded_sequences])
+X_test = np.concatenate(
+    (dna_test_encoded_sequences, rna_test_encoded_sequences, protein_test_encoded_sequences), axis=0)
 X_test = preprocess_input(X_test)
 
 history = autoencoder.fit(
