@@ -39,7 +39,7 @@ def parser_by_len(length):
     seq_list = []
     # Step 2: Fetch the sequences using the IDs
     for id_l in several_id_lists:
-        if len(seq_list) > 80000:
+        if len(seq_list) > 1200:
             print('more then break')
             break
         fetch_params = {
@@ -64,7 +64,7 @@ def parser_by_len(length):
         else:
             print(f"Failed to fetch sequences length={length}: {response.status_code} - {response.reason}")
 
-    with open(f"data/pkl_from_parser_prl_5_40/seq_{length}_{len(seq_list)}.pkl", 'wb') as f:
+    with open(f"data/pkl_from_parser_prl/seq_{length}_{len(seq_list)}.pkl", 'wb') as f:
         pickle.dump(seq_list, f)
 
 
@@ -72,6 +72,6 @@ func_out = Parallel(n_jobs=2)(
     [
         delayed(parser_by_len)(
             length
-        ) for length in range(22, 29)
+        ) for length in [88, 90]
     ]
 )
