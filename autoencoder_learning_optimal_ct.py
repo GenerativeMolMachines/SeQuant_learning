@@ -165,27 +165,11 @@ with strategy.scope():
         callbacks=[early_stop, model_checkpoint_callback]
     )
 
-    with open('trainHistoryDict/all_polymers_trainHistoryDict' + str(num_seq) + '_maxlen' + str(max_len) + '_' + str(
-            pad) + 'pad_alldescs_norm-1to1_batch' + str(batch_size) + '_lr' + str(learning_rate), 'wb') as file_pi:
-        pickle.dump(history.history, file_pi)
+with open('trainHistoryDict/test.pkl', 'wb') as file_pi:
+    pickle.dump(history.history, file_pi)
 
-    # load model learning history
-    with open('trainHistoryDict/all_polymers_trainHistoryDict' + str(num_seq) + '_maxlen' + str(max_len) + '_' + str(
-            pad) + 'pad_alldescs_norm-1to1_batch' + str(batch_size) + '_lr' + str(learning_rate), 'rb') as f:
-        learning_history = pickle.load(f)
+# load model learning history
+with open('trainHistoryDict/test.pkl', 'rb') as f:
+    learning_history = pickle.load(f)
 
-
-# loss_hist = learning_history['loss']
-# val_loss_hist = learning_history['val_loss']
-# x_axis = range(1, len(loss_hist) + 1)
-#
-# plt.plot(x_axis, loss_hist, color='r', label='loss')
-# plt.plot(x_axis, val_loss_hist, color='g', label='val_loss')
-# plt.yticks(np.arange(0, 0.1, 0.005))
-
-# plt.title("Autoencoder learning")
-#
-# plt.legend()
-# plt.savefig('figures/all_polymers.png')
-#
 print("--- %s seconds ---" % (time.time() - start_time))
