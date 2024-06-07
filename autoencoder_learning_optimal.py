@@ -120,7 +120,6 @@ X_test = np.concatenate(
     (dna_test_encoded_sequences, rna_test_encoded_sequences, protein_test_encoded_sequences), axis=0)
 X_test = preprocess_input(X_test)
 
-tf.debugging.set_log_device_placement(True)
 print(tf.config.list_logical_devices())
 start_time = time.time()
 
