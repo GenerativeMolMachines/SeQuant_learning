@@ -55,7 +55,7 @@ channels = 1
 latent_dim = height
 learning_rate = 1e-3
 batch_size = 10
-epochs = 10
+epochs = 2
 tf.keras.backend.clear_session()
 tf.random.set_seed(2022)
 os.environ["KERAS_BACKEND"] = "tensorflow"
@@ -69,15 +69,6 @@ rna_test = pd.read_csv('data/dna_rna/rna_test.csv')
 
 protein_train = pd.read_csv('data/dna_rna/protein_train.csv')
 protein_test = pd.read_csv('data/dna_rna/protein_test.csv')
-
-dna_train = dna_train.sample(n=100)
-dna_test = dna_test.sample(n=50)
-rna_train = rna_train.sample(n=100)
-rna_test = rna_test.sample(n=50)
-protein_train = protein_train.sample(n=100)
-protein_test = protein_test.sample(n=50)
-
-
 
 # Use functions for DNA datasets
 descriptors_set = make_monomer_descriptors(monomer_dict)
@@ -120,7 +111,7 @@ X_test = np.concatenate(
     (dna_test_encoded_sequences, rna_test_encoded_sequences, protein_test_encoded_sequences), axis=0)
 X_test = preprocess_input(X_test)
 
-tf.debugging.set_log_device_placement(True)
+# tf.debugging.set_log_device_placement(True)
 print(tf.config.list_logical_devices('GPU'))
 start_time = time.time()
 # model init
