@@ -112,6 +112,8 @@ X_test = np.concatenate(
 X_test = preprocess_input(X_test)
 
 # tf.debugging.set_log_device_placement(True)
+print("X_train shape " + X_train.shape)
+print("X_test shape " + X_test.shape)
 print(tf.config.list_logical_devices('GPU'))
 start_time = time.time()
 # model init
