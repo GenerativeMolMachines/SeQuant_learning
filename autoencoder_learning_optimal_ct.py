@@ -3,8 +3,6 @@ import time
 import pickle
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-from operator import itemgetter
 
 import tensorflow as tf
 from autoencoder_preset_tools import (
@@ -12,20 +10,12 @@ from autoencoder_preset_tools import (
     seq_to_matrix,
     encode_seqs,
     preprocess_input,
-    train_test_split,
-    filter_sequences
 )
-from autoencoder_optimal import autoencoder_model
+from autoencoder_optimal_ct import autoencoder_model
 
-# timer
-start_time = time.time()
 
 # variables
 max_len = 96
-ratio_of_samples_to_use = 0.025
-n_samples = 100000
-num_seq = 100000
-pad = -1
 monomer_dict = {
     'dA': r'O=P(O)(O)OP(=O)(O)OP(=O)(O)OC[C@H]3O[C@@H](n2cnc1c(ncnc12)N)C[C@@H]3O',  # DNA
     'dT': r'CC1=CN(C(=O)NC1=O)C2CC(C(O2)COP(=O)(O)OP(=O)(O)OP(=O)(O)O)O',
@@ -65,10 +55,9 @@ channels = 1
 latent_dim = height
 learning_rate = 1e-3
 batch_size = 10
-epochs = 200
+epochs = 10
 tf.keras.backend.clear_session()
 tf.random.set_seed(2022)
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 os.environ["KERAS_BACKEND"] = "tensorflow"
 
 # Loading balanced datasets
@@ -123,47 +112,48 @@ assert np.all(
         polymer_type='protein'
     ) == protein_test_encoded_sequences[0, :, :]
 )
-strategy = tf.distribute.MirroredStrategy()
-print("Number of devices: {}".format(strategy.num_replicas_in_sync))
-with strategy.scope():
-    X_train = np.concatenate(
-        (dna_train_encoded_sequences, rna_train_encoded_sequences, protein_train_encoded_sequences), axis=0)
-    X_train = preprocess_input(X_train)
-    X_test = np.concatenate(
-        (dna_test_encoded_sequences, rna_test_encoded_sequences, protein_test_encoded_sequences), axis=0)
-    X_test = preprocess_input(X_test)
 
-    # model init
-    autoencoder = autoencoder_model(
-        height=height,
-        width=width,
-        channels=channels,
-        latent_dim=latent_dim,
-        learning_rate=learning_rate
-    )
+X_train = np.concatenate(
+    (dna_train_encoded_sequences, rna_train_encoded_sequences, protein_train_encoded_sequences), axis=0)
+X_train = preprocess_input(X_train)
+X_test = np.concatenate(
+    (dna_test_encoded_sequences, rna_test_encoded_sequences, protein_test_encoded_sequences), axis=0)
+X_test = preprocess_input(X_test)
 
-    # set checkpoint
-    checkpoint_filepath = 'checkpoint/checkpoint_all_polymers'
-    model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-        filepath=checkpoint_filepath,
-        save_weights_only=False,
-        monitor='val_loss',
-        mode='max',
-        save_best_only=True
-    )
+tf.debugging.set_log_device_placement(True)
+print(tf.config.list_logical_devices('GPU'))
+start_time = time.time()
+# model init
+autoencoder = autoencoder_model(
+    height=height,
+    width=width,
+    channels=channels,
+    latent_dim=latent_dim,
+    learning_rate=learning_rate
+)
 
-    early_stop = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3)
+# set checkpoint
+checkpoint_filepath = 'checkpoint/checkpoint_all_polymers'
+model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+    filepath=checkpoint_filepath,
+    save_weights_only=False,
+    monitor='val_loss',
+    mode='max',
+    save_best_only=True
+)
 
-    # Training
+early_stop = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3)
 
-    history = autoencoder.fit(
-        X_train,
-        X_train,
-        epochs=epochs,
-        validation_data=(X_test, X_test),
-        verbose=2,
-        callbacks=[early_stop, model_checkpoint_callback]
-    )
+# Training
+
+history = autoencoder.fit(
+    X_train,
+    X_train,
+    epochs=epochs,
+    validation_data=(X_test, X_test),
+    verbose=2,
+    callbacks=[early_stop, model_checkpoint_callback]
+)
 
 with open('trainHistoryDict/test.pkl', 'wb') as file_pi:
     pickle.dump(history.history, file_pi)
