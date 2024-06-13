@@ -55,7 +55,7 @@ channels = 1
 latent_dim = height
 learning_rate = 1e-3
 batch_size = 10
-epochs = 2
+epochs = 100
 tf.keras.backend.clear_session()
 tf.random.set_seed(2022)
 os.environ["KERAS_BACKEND"] = "tensorflow"
