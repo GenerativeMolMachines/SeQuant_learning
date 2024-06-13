@@ -61,32 +61,12 @@ tf.random.set_seed(2022)
 os.environ["KERAS_BACKEND"] = "tensorflow"
 
 # Loading balanced datasets
-dna_train = pd.read_csv('data/dna_rna/dna_train.csv')
-dna_test = pd.read_csv('data/dna_rna/dna_test.csv')
-
-rna_train = pd.read_csv('data/dna_rna/rna_train.csv')
-rna_test = pd.read_csv('data/dna_rna/rna_test.csv')
-
 protein_train = pd.read_csv('data/dna_rna/protein_train.csv')
 protein_test = pd.read_csv('data/dna_rna/protein_test.csv')
 
-# Use functions for DNA datasets
+# Use functions for protein datasets
 descriptors_set = make_monomer_descriptors(monomer_dict)
 #
-dna_train_encoded_sequences = encode_seqs(dna_train['sequence'], descriptors_set, max_len, polymer_type='DNA')
-dna_train_encoded_sequences = np.moveaxis(dna_train_encoded_sequences, -1, 0)
-
-dna_test_encoded_sequences = encode_seqs(dna_test['sequence'].tolist(), descriptors_set, max_len, polymer_type='DNA')
-dna_test_encoded_sequences = np.moveaxis(dna_test_encoded_sequences, -1, 0)
-#
-# Use functions for RNA datasets
-rna_train_encoded_sequences = encode_seqs(rna_train['sequence'].tolist(), descriptors_set, max_len, polymer_type='RNA')
-rna_train_encoded_sequences = np.moveaxis(rna_train_encoded_sequences, -1, 0)
-
-rna_test_encoded_sequences = encode_seqs(rna_test['sequence'].tolist(), descriptors_set, max_len, polymer_type='RNA')
-rna_test_encoded_sequences = np.moveaxis(rna_test_encoded_sequences, -1, 0)
-# #
-# # Use functions for protein datasets
 protein_train_encoded_sequences = encode_seqs(protein_train['sequence'].tolist(), descriptors_set, max_len, polymer_type='protein')
 protein_train_encoded_sequences = np.moveaxis(protein_train_encoded_sequences, -1, 0)
 
@@ -104,16 +84,15 @@ assert np.all(
     ) == protein_test_encoded_sequences[0, :, :]
 )
 
-X_train = np.concatenate(
-    (dna_train_encoded_sequences, rna_train_encoded_sequences, protein_train_encoded_sequences), axis=0)
+X_train = protein_train_encoded_sequences
 X_train = preprocess_input(X_train)
-X_test = np.concatenate(
-    (dna_test_encoded_sequences, rna_test_encoded_sequences, protein_test_encoded_sequences), axis=0)
+X_test = protein_test_encoded_sequences
 X_test = preprocess_input(X_test)
 
 # tf.debugging.set_log_device_placement(True)
-print("X_train shape " + X_train.shape)
-print("X_test shape " + X_test.shape)
+print(f"X_train shape {X_train.shape[0]}")
+print(f"X_test shape {X_test.shape[0]}")
+
 print(tf.config.list_logical_devices('GPU'))
 start_time = time.time()
 # model init
@@ -148,11 +127,11 @@ history = autoencoder.fit(
     callbacks=[early_stop, model_checkpoint_callback]
 )
 
-with open('trainHistoryDict/test.pkl', 'wb') as file_pi:
+with open('trainHistoryDict/protein.pkl', 'wb') as file_pi:
     pickle.dump(history.history, file_pi)
 
 # load model learning history
-with open('trainHistoryDict/test.pkl', 'rb') as f:
+with open('trainHistoryDict/protein.pkl', 'rb') as f:
     learning_history = pickle.load(f)
 
 print("--- %s seconds ---" % (time.time() - start_time))
