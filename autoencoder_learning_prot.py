@@ -114,7 +114,7 @@ model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
     save_best_only=True
 )
 
-early_stop = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3)
+early_stop = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
 
 # Training
 
