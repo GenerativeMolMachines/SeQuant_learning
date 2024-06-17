@@ -89,7 +89,7 @@ assert np.all(
         sequence=dna_test_list[0],
         descriptors=descriptors_set,
         num=max_len,
-        polymer_type='protein'
+        polymer_type='DNA'
     ) == dna_test_encoded_sequences[0, :, :]
 )
 
