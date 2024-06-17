@@ -107,30 +107,33 @@ print(f"X_test shape {X_test.shape[0]}")
 print(tf.config.list_logical_devices('GPU'))
 start_time = time.time()
 # model init
-autoencoder = tf.keras.models.load_model('checkpoint/checkpoint_all_polymers')
+gpus = tf.config.list_logical_devices('GPU')
+strategy = tf.distribute.MirroredStrategy(gpus)
+with strategy.scope():
+    autoencoder = tf.keras.models.load_model('checkpoint/checkpoint_all_polymers')
 
-# set checkpoint
-checkpoint_filepath = 'checkpoint/checkpoint_aptamers'
-model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-    filepath=checkpoint_filepath,
-    save_weights_only=False,
-    monitor='val_loss',
-    mode='max',
-    save_best_only=True
-)
+    # set checkpoint
+    checkpoint_filepath = 'checkpoint/checkpoint_aptamers'
+    model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+        filepath=checkpoint_filepath,
+        save_weights_only=False,
+        monitor='val_loss',
+        mode='max',
+        save_best_only=True
+    )
 
-early_stop = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
+    early_stop = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
 
-# Training
+    # Training
 
-history = autoencoder.fit(
-    X_train,
-    X_train,
-    epochs=epochs,
-    validation_data=(X_test, X_test),
-    verbose=2,
-    callbacks=[early_stop, model_checkpoint_callback]
-)
+    history = autoencoder.fit(
+        X_train,
+        X_train,
+        epochs=epochs,
+        validation_data=(X_test, X_test),
+        verbose=2,
+        callbacks=[early_stop, model_checkpoint_callback]
+    )
 
 with open('trainHistoryDict/aptamers.pkl', 'wb') as file_pi:
     pickle.dump(history.history, file_pi)
