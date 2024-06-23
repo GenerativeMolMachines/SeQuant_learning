@@ -1,31 +1,19 @@
 import os
 import time
 import pickle
-import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from operator import itemgetter
 
 import tensorflow as tf
 from autoencoder_preset_tools import (
-    make_monomer_descriptors,
-    seq_to_matrix,
-    encode_seqs,
-    preprocess_input,
-    train_test_split,
-    filter_sequences
+    create_dataset_from_batches,
+    batch_creation
 )
-from autoencoder_optimal import autoencoder_model
+from autoencoder import autoencoder_model
 
-# timer
-start_time = time.time()
 
 # variables
 max_len = 96
-ratio_of_samples_to_use = 0.025
-n_samples = 100000
-num_seq = 100000
-pad = -1
 monomer_dict = {
     'A': 'CC(C(=O)O)N', 'R': 'C(CC(C(=O)O)N)CN=C(N)N', 'N': 'C(C(C(=O)O)N)C(=O)N',
     'D': 'C(C(C(=O)O)N)C(=O)O', 'C': 'C(C(C(=O)O)N)S', 'Q': 'C(CC(=O)N)C(C(=O)O)N',
@@ -42,11 +30,11 @@ width = 96
 channels = 1
 latent_dim = height
 learning_rate = 1e-3
-batch_size = 10
-epochs = 1000
+batch_size = 10000
+epochs = 100
 tf.keras.backend.clear_session()
 tf.random.set_seed(2022)
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ["KERAS_BACKEND"] = "tensorflow"
 
 # Loading balanced dataset
 with open('data/test_seq_clean_str.pkl', 'rb') as f:
@@ -55,22 +43,14 @@ with open('data/test_seq_clean_str.pkl', 'rb') as f:
 with open('data/train_seq_clean_str.pkl', 'rb') as f:
     train_data = pickle.load(f)
 
-# Use functions
-descriptors_set = make_monomer_descriptors(monomer_dict)
-test_encoded_sequences = encode_seqs(test_data, descriptors_set, max_len)
-test_encoded_sequences = np.moveaxis(test_encoded_sequences, -1, 0)
+# Batching
+num_batches = len(train_data) // batch_size
+train_batches = batch_creation(train_data, num_batches)
+test_batches = batch_creation(test_data, num_batches)
 
-train_encoded_sequences = encode_seqs(train_data, descriptors_set, max_len)
-train_encoded_sequences = np.moveaxis(train_encoded_sequences, -1, 0)
-
-# check if transformation is correct
-assert np.all(
-    seq_to_matrix(
-        sequence=test_data[0],
-        descriptors=descriptors_set,
-        num=max_len
-    ) == test_encoded_sequences[0, :, :]
-)
+# tf.data.Dataset creation
+train_dataset = create_dataset_from_batches(batches=train_batches, monomer_dict=monomer_dict, max_len=max_len)
+test_dataset = create_dataset_from_batches(batches=test_batches, monomer_dict=monomer_dict, max_len=max_len)
 
 # model init
 autoencoder = autoencoder_model(
@@ -82,7 +62,7 @@ autoencoder = autoencoder_model(
 )
 
 # set checkpoint
-checkpoint_filepath = 'checkpoint/checkpoint_optimal'
+checkpoint_filepath = 'checkpoint/checkpoint_batching'
 model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
     filepath=checkpoint_filepath,
     save_weights_only=False,
@@ -91,29 +71,28 @@ model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
     save_best_only=True
 )
 
-early_stop = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3)
+early_stop = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
+
+start_time = time.time()
 
 # Training
-X_train = preprocess_input(train_encoded_sequences)
-X_test = preprocess_input(test_encoded_sequences)
-
 history = autoencoder.fit(
-    X_train,
-    X_train,
+    train_dataset,
+    train_dataset,
     epochs=epochs,
-    validation_data=(X_test, X_test),
+    validation_data=(test_dataset, test_dataset),
     verbose=2,
     callbacks=[early_stop, model_checkpoint_callback]
 )
 
-with open('trainHistoryDict/optimal_trainHistoryDict' + str(num_seq) + '_maxlen' + str(max_len) + '_' + str(
-        pad) + 'pad_alldescs_norm-1to1_batch' + str(batch_size) + '_lr' + str(learning_rate), 'wb') as file_pi:
+with open('trainHistoryDict/batching.pkl', 'wb') as file_pi:
     pickle.dump(history.history, file_pi)
 
 # load model learning history
-with open('trainHistoryDict/optimal_trainHistoryDict' + str(num_seq) + '_maxlen' + str(max_len) + '_' + str(
-        pad) + 'pad_alldescs_norm-1to1_batch' + str(batch_size) + '_lr' + str(learning_rate), 'rb') as f:
+with open('trainHistoryDict/batching.pkl', 'rb') as f:
     learning_history = pickle.load(f)
+
+print("--- %s seconds ---" % (time.time() - start_time))
 
 loss_hist = learning_history['loss']
 val_loss_hist = learning_history['val_loss']
@@ -126,6 +105,6 @@ plt.yticks(np.arange(0, 0.1, 0.005))
 plt.title("Autoencoder learning")
 
 plt.legend()
-plt.savefig('figures/optimal.png')
+plt.savefig('figures/batching.png')
 
 print("--- %s seconds ---" % (time.time() - start_time))

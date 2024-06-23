@@ -94,14 +94,17 @@ def decoder(x: KerasTensor, height: int) -> tf.Tensor:
 
 
 def autoencoder_model(height: int, width: int, channels: int, latent_dim: int, learning_rate: float) -> tf.keras.Model:
-    inputs = Input(shape=(height, width, channels))
-    x = inputs
-    x = encoder(x, height)
-    x = latent_space(x, latent_dim)
-    output = decoder(x, height)
-    autoencoder = Model(inputs, output, name='Conv_Autoencoder')
-    autoencoder.compile(
-        optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
-        loss='mean_squared_error'
-    )
+    gpus = tf.config.list_logical_devices('GPU')
+    strategy = tf.distribute.MirroredStrategy(gpus)
+    with strategy.scope():
+        inputs = Input(shape=(height, width, channels))
+        x = inputs
+        x = encoder(x, height)
+        x = latent_space(x, latent_dim)
+        output = decoder(x, height)
+        autoencoder = Model(inputs, output, name='Conv_Autoencoder')
+        autoencoder.compile(
+            optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
+            loss='mean_squared_error'
+        )
     return autoencoder

@@ -5,6 +5,8 @@ from rdkit.Chem import Descriptors, rdMolDescriptors
 from sklearn.preprocessing import MinMaxScaler
 from tqdm import tqdm
 
+import tensorflow as tf
+
 
 def make_monomer_descriptors(monomer_dict: dict[str, str]) -> pd.DataFrame:
     descriptor_names = list(rdMolDescriptors.Properties.GetAvailableProperties())
@@ -102,3 +104,67 @@ def filter_sequences(
         if set(seq).issubset(set(known_symbols)):
             filtered_sequences.append(seq)
     return filtered_sequences
+
+
+def data_processing(
+        batch_data: list[str],
+        monomer_dict: dict[str, str],
+        max_len: int
+):
+    descriptors_set = make_monomer_descriptors(monomer_dict)
+    batch_encoded_sequences = encode_seqs(batch_data, descriptors_set, max_len)
+    batch_encoded_sequences = np.moveaxis(batch_encoded_sequences, -1, 0)
+
+    batch_processed = preprocess_input(batch_encoded_sequences)
+
+    return batch_processed
+
+
+def batch_creation(
+        data: list[str],
+        num_batches: int
+) -> list[list[str]]:
+    """
+    Coverts initial data (list of sequences) to the batches
+    :param data: list of polymer sequences
+    :param num_batches: number of batches
+    :return: list of lists with batch_size sequences in each
+    """
+
+    lengths = [len(seq) for seq in data]
+
+    data_by_length = {}
+    for length, seq in zip(lengths, data):
+        if length not in data_by_length:
+            data_by_length[length] = []
+        if len(seq) == length:
+            data_by_length[length].append(seq)
+        else:
+            print(f'Length of the sequence {seq} does not match with key length {length}')
+
+    batches = [[] for _ in range(num_batches)]
+
+    for length, seqs in data_by_length.items():
+        np.random.shuffle(seqs)
+
+        for i, seq in enumerate(seqs):
+            batches[i % num_batches].append(seq)
+
+    return batches
+
+
+def create_dataset_from_batches(
+        batches: list[list[str]],
+        monomer_dict: dict[str, str],
+        max_len: int
+):
+    def generator():
+        for batch in batches:
+            processed_batch = data_processing(batch, monomer_dict, max_len)
+            yield processed_batch
+
+    dataset = tf.data.Dataset.from_generator(
+        generator,
+        output_signature=tf.TensorSpec(shape=(None, None, None, None), dtype=tf.float32)
+    )
+    return dataset
