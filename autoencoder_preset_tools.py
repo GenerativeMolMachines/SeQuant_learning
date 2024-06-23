@@ -31,7 +31,6 @@ def make_monomer_descriptors(monomer_dict: dict[str, str]) -> pd.DataFrame:
 
     scaled_energy = sc.fit_transform(energy_set)
     scaled_energy_set = pd.DataFrame(scaled_energy, columns=energy_names, index=monomer_dict.keys())
-    scaled_energy_set.loc['water'].fillna(-1, inplace=True)
 
     all_descriptors = pd.concat([descriptors_set, scaled_energy_set], axis=1)
     return all_descriptors

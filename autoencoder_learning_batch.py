@@ -22,7 +22,7 @@ monomer_dict = {
     'M': 'CSCCC(C(=O)O)N', 'F': 'C1=CC=C(C=C1)CC(C(=O)O)N', 'P': 'C1CC(NC1)C(=O)O',
     'S': 'C(C(C(=O)O)N)O', 'T': 'CC(C(C(=O)O)N)O', 'W': 'C1=CC=C2C(=C1)C(=CN2)CC(C(=O)O)N',
     'Y': 'C1=CC(=CC=C1CC(C(=O)O)N)O', 'V': 'CC(C)C(C(=O)O)N', 'O': 'CC1CC=NC1C(=O)NCCCCC(C(=O)O)N',
-    'U': 'C(C(C(=O)O)N)[Se]', 'water': 'O'
+    'U': 'C(C(C(=O)O)N)[Se]'
 }
 # hyperparameters
 height = 46
