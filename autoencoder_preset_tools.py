@@ -160,10 +160,13 @@ def create_dataset_from_batches(
     def generator():
         for batch in batches:
             processed_batch = data_processing(batch, monomer_dict, max_len)
-            yield processed_batch
+            yield processed_batch, processed_batch
 
     dataset = tf.data.Dataset.from_generator(
         generator,
-        output_signature=tf.TensorSpec(shape=(None, None, None, None), dtype=tf.float32)
+        output_signature=(
+            tf.TensorSpec(shape=(None, None, None, None), dtype=tf.float32),  # input
+            tf.TensorSpec(shape=(None, None, None, None), dtype=tf.float32)  # target
+        )
     )
     return dataset

@@ -78,9 +78,8 @@ start_time = time.time()
 # Training
 history = autoencoder.fit(
     train_dataset,
-    train_dataset,
     epochs=epochs,
-    validation_data=(test_dataset, test_dataset),
+    validation_data=test_dataset,
     verbose=2,
     callbacks=[early_stop, model_checkpoint_callback]
 )
