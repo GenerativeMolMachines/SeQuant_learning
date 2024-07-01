@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 from autoencoder_preset_tools import (
     create_dataset_from_batches,
-    batch_creation
+    oversampling
 )
 from autoencoder import autoencoder_model
 
@@ -30,7 +30,7 @@ width = 96
 channels = 1
 latent_dim = height
 learning_rate = 1e-3
-batch_size = 10000
+batch_size = 64
 epochs = 100
 tf.keras.backend.clear_session()
 tf.random.set_seed(2022)
@@ -43,10 +43,17 @@ with open('data/test_seq_clean_str.pkl', 'rb') as f:
 with open('data/train_seq_clean_str.pkl', 'rb') as f:
     train_data = pickle.load(f)
 
+# Oversampling
+train_data = oversampling(sequences=train_data, target_divisor=batch_size)
+test_data = oversampling(sequences=test_data, target_divisor=batch_size)
+
+np.random.shuffle(train_data)
+np.random.shuffle(test_data)
+
 # Batching
-num_batches = len(train_data) // batch_size
-train_batches = batch_creation(train_data, num_batches)
-test_batches = batch_creation(test_data, num_batches)
+train_batches = [train_data[i:i + batch_size] for i in range(0, len(train_data), batch_size)]
+test_batches = [test_data[i:i + batch_size] for i in range(0, len(test_data), batch_size)]
+
 
 # tf.data.Dataset creation
 train_dataset = create_dataset_from_batches(batches=train_batches, monomer_dict=monomer_dict, max_len=max_len)

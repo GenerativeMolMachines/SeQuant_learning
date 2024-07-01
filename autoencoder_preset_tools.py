@@ -119,17 +119,17 @@ def data_processing(
     return batch_processed
 
 
-def batch_creation(
+def batch_creation_arch(
         data: list[str],
-        num_batches: int
+        batch_size: int
 ) -> list[list[str]]:
     """
     Coverts initial data (list of sequences) to the batches
     :param data: list of polymer sequences
-    :param num_batches: number of batches
+    :param batch_size: number of sequences in a batch
     :return: list of lists with batch_size sequences in each
     """
-
+    num_batches = len(data) // batch_size
     lengths = [len(seq) for seq in data]
 
     data_by_length = {}
@@ -146,10 +146,13 @@ def batch_creation(
     for length, seqs in data_by_length.items():
         np.random.shuffle(seqs)
 
-        for i, seq in enumerate(seqs):
-            batches[i % num_batches].append(seq)
+        for length, seqs in data_by_length.items():
+            np.random.shuffle(seqs)
 
-    return batches
+            for i, seq in enumerate(seqs):
+                batches[i % num_batches].append(seq)
+
+        return batches
 
 
 def create_dataset_from_batches(
@@ -170,3 +173,24 @@ def create_dataset_from_batches(
         )
     )
     return dataset
+
+
+def oversampling(
+        sequences: list[str],
+        target_divisor: int
+):
+    current_size = len(sequences)
+    remainder = current_size % target_divisor
+
+    if remainder == 0:
+        print("Dataset size is already equal to ", target_divisor)
+        return sequences
+
+    additional_records_needed = target_divisor - remainder
+
+    sampled_indices = np.random.choice(len(sequences), size=additional_records_needed, replace=True)
+    oversampled_sequences = [sequences[i] for i in sampled_indices]
+
+    result_sequences = sequences + oversampled_sequences
+
+    return result_sequences
