@@ -3,7 +3,6 @@ import numpy as np
 from rdkit import Chem
 from rdkit.Chem import Descriptors, rdMolDescriptors
 from sklearn.preprocessing import MinMaxScaler
-from tqdm import tqdm
 
 import tensorflow as tf
 
@@ -69,7 +68,7 @@ def encode_seqs(
 ):
     lst = []
     i = 0
-    for sequence in tqdm(sequences_list):
+    for sequence in sequences_list:
         seq_matrix = seq_to_matrix(sequence=sequence, descriptors=descriptors, num=num)
         lst.append(seq_matrix)
         i += 1
