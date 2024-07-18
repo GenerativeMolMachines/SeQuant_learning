@@ -10,46 +10,59 @@ from keras.layers import (
     Conv2DTranspose,
     LeakyReLU,
     Activation,
-    Dropout
+    Dropout,
+    MultiHeadAttention
 )
 from keras.models import Model
 from keras.engine.keras_tensor import KerasTensor
 
 
-def encoder(x: KerasTensor, height: int) -> tf.Tensor:
+def encoder(x: KerasTensor, height: int, width: int) -> tf.Tensor:
     x = Conv2D(height*8, (1, 4), padding='same')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.2)(x)
+    attention_output = MultiHeadAttention(num_heads=4, key_dim=width, dropout=0.1)(x, x)
+    x = attention_output + x
     x = AveragePooling2D((1, 3))(x)
     x = Dropout(0.1)(x)
 
     x = Conv2D(height*8, (1, 4), padding='same')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.2)(x)
+    attention_output = MultiHeadAttention(num_heads=4, key_dim=width/3, dropout=0.1)(x, x)
+    x = attention_output + x
     x = AveragePooling2D((1, 2))(x)
     x = Dropout(0.1)(x)
 
     x = Conv2D(height*4, (1, 4), padding='same')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.2)(x)
+    attention_output = MultiHeadAttention(num_heads=4, key_dim=width/6, dropout=0.1)(x, x)
+    x = attention_output + x
     x = AveragePooling2D((1, 2))(x)
     x = Dropout(0.1)(x)
 
     x = Conv2D(height*2, (1, 4), padding='same')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.2)(x)
+    attention_output = MultiHeadAttention(num_heads=2, key_dim=width/12, dropout=0.1)(x, x)
+    x = attention_output + x
     x = AveragePooling2D((1, 2))(x)
     x = Dropout(0.1)(x)
 
     x = Conv2D(height, (1, 4), padding='same')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.2)(x)
+    attention_output = MultiHeadAttention(num_heads=2, key_dim=width/24, dropout=0.1)(x, x)
+    x = attention_output + x
     x = AveragePooling2D((1, 2))(x)
     x = Dropout(0.1)(x)
 
     x = Conv2D(1, (1, 4), padding='same')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.2)(x)
+    attention_output = MultiHeadAttention(num_heads=1, key_dim=width/48, dropout=0.1)(x, x)
+    x = attention_output + x
     x = AveragePooling2D((1, 2))(x)
     x = Dropout(0.1)(x)
     return x
@@ -99,7 +112,7 @@ def autoencoder_model(height: int, width: int, channels: int, latent_dim: int, l
     with strategy.scope():
         inputs = Input(shape=(height, width, channels))
         x = inputs
-        x = encoder(x, height)
+        x = encoder(x, height, width)
         x = latent_space(x, latent_dim)
         output = decoder(x, height)
         autoencoder = Model(inputs, output, name='Conv_Autoencoder')
