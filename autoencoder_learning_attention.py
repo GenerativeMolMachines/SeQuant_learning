@@ -31,7 +31,7 @@ channels = 1
 latent_dim = height
 learning_rate = 1e-3
 batch_size = 64
-epochs = 10
+epochs = 100
 tf.keras.backend.clear_session()
 tf.random.set_seed(2022)
 os.environ["KERAS_BACKEND"] = "tensorflow"
@@ -42,10 +42,6 @@ with open('data/test_seq_clean_str.pkl', 'rb') as f:
 
 with open('data/train_seq_clean_str.pkl', 'rb') as f:
     train_data = pickle.load(f)
-
-# Sampling
-train_data = train_data[:1000]
-test_data = test_data[:430]
 
 # Oversampling
 train_data = oversampling(sequences=train_data, target_divisor=batch_size)
@@ -73,7 +69,7 @@ autoencoder = autoencoder_model(
 )
 
 # set checkpoint
-checkpoint_filepath = 'checkpoint/checkpoint_test_attention'
+checkpoint_filepath = 'checkpoint/checkpoint_attention'
 model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
     filepath=checkpoint_filepath,
     save_weights_only=False,
@@ -95,26 +91,11 @@ history = autoencoder.fit(
     callbacks=[early_stop, model_checkpoint_callback]
 )
 
-with open('trainHistoryDict/test_attention.pkl', 'wb') as file_pi:
+with open('trainHistoryDict/attention.pkl', 'wb') as file_pi:
     pickle.dump(history.history, file_pi)
 
 # load model learning history
-with open('trainHistoryDict/test_attention.pkl', 'rb') as f:
+with open('trainHistoryDict/attention.pkl', 'rb') as f:
     learning_history = pickle.load(f)
-
-print("--- %s seconds ---" % (time.time() - start_time))
-
-loss_hist = learning_history['loss']
-val_loss_hist = learning_history['val_loss']
-x_axis = range(1, len(loss_hist) + 1)
-
-plt.plot(x_axis, loss_hist, color='r', label='loss')
-plt.plot(x_axis, val_loss_hist, color='g', label='val_loss')
-plt.yticks(np.arange(0, 0.1, 0.005))
-
-plt.title("Autoencoder learning")
-
-plt.legend()
-plt.savefig('figures/test_attention.png')
 
 print("--- %s seconds ---" % (time.time() - start_time))
