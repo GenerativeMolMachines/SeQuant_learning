@@ -11,58 +11,128 @@ from keras.layers import (
     LeakyReLU,
     Activation,
     Dropout,
-    MultiHeadAttention
+    MultiHeadAttention,
+    Permute
 )
 from keras.models import Model
 from keras.engine.keras_tensor import KerasTensor
 
 
 def encoder(x: KerasTensor, height: int, width: int) -> tf.Tensor:
-    x = Conv2D(height*8, (1, 4), padding='same')(x)
+    # First block
+    filters = height * 8
+    x = Conv2D(filters, (1, 4), padding='same')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.2)(x)
-    attention_output = MultiHeadAttention(num_heads=4, key_dim=width, dropout=0.1)(x, x)
-    x = attention_output + x
+
+    x_permuted = Permute((2, 1, 3))(x)  # shape: (batch_size, width, height, filters)
+    batch_size = tf.shape(x_permuted)[0]
+    new_shape = tf.concat([[batch_size], [width], [height * filters]],
+                          axis=0)  # shape: (batch_size, width, height * filters)
+    x_reshaped = tf.reshape(x_permuted, new_shape)
+    attention_output = MultiHeadAttention(num_heads=4, key_dim=(filters // 2), dropout=0.1)(x_reshaped, x_reshaped)
+    new_shape_back = tf.concat([[batch_size], [width], [height], [filters]], axis=0)  # shape: (batch_size, width, height, filters)
+    attention_output_reshaped = tf.reshape(attention_output, new_shape_back)
+    attention_output_permuted_back = Permute((2, 1, 3))(attention_output_reshaped)  # shape: (batch_size, height, width, filters)
+    x = attention_output_permuted_back + x
+
     x = AveragePooling2D((1, 3))(x)
     x = Dropout(0.1)(x)
+    width = width // 3
 
-    x = Conv2D(height*8, (1, 4), padding='same')(x)
+    # Second block
+    filters = height * 8
+    x = Conv2D(filters, (1, 4), padding='same')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.2)(x)
-    attention_output = MultiHeadAttention(num_heads=4, key_dim=width/3, dropout=0.1)(x, x)
-    x = attention_output + x
+
+    x_permuted = Permute((2, 1, 3))(x)  # shape: (batch_size, width, height, filters)
+    batch_size = tf.shape(x_permuted)[0]
+    new_shape = tf.concat([[batch_size], [width], [height * filters]],
+                          axis=0)  # shape: (batch_size, width, height * filters)
+    x_reshaped = tf.reshape(x_permuted, new_shape)
+    attention_output = MultiHeadAttention(num_heads=4, key_dim=(filters // 2), dropout=0.1)(x_reshaped, x_reshaped)
+    new_shape_back = tf.concat([[batch_size], [width], [height], [filters]], axis=0)  # shape: (batch_size, width, height, filters)
+    attention_output_reshaped = tf.reshape(attention_output, new_shape_back)
+    attention_output_permuted_back = Permute((2, 1, 3))(attention_output_reshaped)  # shape: (batch_size, height, width, filters)
+    x = attention_output_permuted_back + x
+
+    x = AveragePooling2D((1, 2))(x)
+    x = Dropout(0.1)(x)
+    width = width // 2
+
+    # Third block
+    filters = height * 4
+    x = Conv2D(filters, (1, 4), padding='same')(x)
+    x = BatchNormalization()(x)
+    x = LeakyReLU(alpha=0.2)(x)
+
+    x_permuted = Permute((2, 1, 3))(x)  # shape: (batch_size, width, height, filters)
+    batch_size = tf.shape(x_permuted)[0]
+    new_shape = tf.concat([[batch_size], [width], [height * filters]],
+                          axis=0)  # shape: (batch_size, width, height * filters)
+    x_reshaped = tf.reshape(x_permuted, new_shape)
+    attention_output = MultiHeadAttention(num_heads=4, key_dim=filters, dropout=0.1)(x_reshaped, x_reshaped)
+    new_shape_back = tf.concat([[batch_size], [width], [height], [filters]],
+                               axis=0)  # shape: (batch_size, width, height, filters)
+    attention_output_reshaped = tf.reshape(attention_output, new_shape_back)
+    attention_output_permuted_back = Permute((2, 1, 3))(
+        attention_output_reshaped)  # shape: (batch_size, height, width, filters)
+    x = attention_output_permuted_back + x
+
+    x = AveragePooling2D((1, 2))(x)
+    x = Dropout(0.1)(x)
+    width = width // 2
+
+    # Fourth block
+    filters = height * 2
+    x = Conv2D(filters, (1, 4), padding='same')(x)
+    x = BatchNormalization()(x)
+    x = LeakyReLU(alpha=0.2)(x)
+
+    x_permuted = Permute((2, 1, 3))(x)  # shape: (batch_size, width, height, filters)
+    batch_size = tf.shape(x_permuted)[0]
+    new_shape = tf.concat([[batch_size], [width], [height * filters]],
+                          axis=0)  # shape: (batch_size, width, height * filters)
+    x_reshaped = tf.reshape(x_permuted, new_shape)
+    attention_output = MultiHeadAttention(num_heads=4, key_dim=filters, dropout=0.1)(x_reshaped, x_reshaped)
+    new_shape_back = tf.concat([[batch_size], [width], [height], [filters]],
+                               axis=0)  # shape: (batch_size, width, height, filters)
+    attention_output_reshaped = tf.reshape(attention_output, new_shape_back)
+    attention_output_permuted_back = Permute((2, 1, 3))(
+        attention_output_reshaped)  # shape: (batch_size, height, width, filters)
+    x = attention_output_permuted_back + x
+
+    x = AveragePooling2D((1, 2))(x)
+    x = Dropout(0.1)(x)
+    width = width // 2
+
+    # Fifth block
+    filters = height
+    x = Conv2D(filters, (1, 4), padding='same')(x)
+    x = BatchNormalization()(x)
+    x = LeakyReLU(alpha=0.2)(x)
+
+    x_permuted = Permute((2, 1, 3))(x)  # shape: (batch_size, width, height, filters)
+    batch_size = tf.shape(x_permuted)[0]
+    new_shape = tf.concat([[batch_size], [width], [height * filters]],
+                          axis=0)  # shape: (batch_size, width, height * filters)
+    x_reshaped = tf.reshape(x_permuted, new_shape)
+    attention_output = MultiHeadAttention(num_heads=2, key_dim=filters, dropout=0.1)(x_reshaped, x_reshaped)
+    new_shape_back = tf.concat([[batch_size], [width], [height], [filters]],
+                               axis=0)  # shape: (batch_size, width, height, filters)
+    attention_output_reshaped = tf.reshape(attention_output, new_shape_back)
+    attention_output_permuted_back = Permute((2, 1, 3))(
+        attention_output_reshaped)  # shape: (batch_size, height, width, filters)
+    x = attention_output_permuted_back + x
+
     x = AveragePooling2D((1, 2))(x)
     x = Dropout(0.1)(x)
 
-    x = Conv2D(height*4, (1, 4), padding='same')(x)
-    x = BatchNormalization()(x)
-    x = LeakyReLU(alpha=0.2)(x)
-    attention_output = MultiHeadAttention(num_heads=4, key_dim=width/6, dropout=0.1)(x, x)
-    x = attention_output + x
-    x = AveragePooling2D((1, 2))(x)
-    x = Dropout(0.1)(x)
-
-    x = Conv2D(height*2, (1, 4), padding='same')(x)
-    x = BatchNormalization()(x)
-    x = LeakyReLU(alpha=0.2)(x)
-    attention_output = MultiHeadAttention(num_heads=2, key_dim=width/12, dropout=0.1)(x, x)
-    x = attention_output + x
-    x = AveragePooling2D((1, 2))(x)
-    x = Dropout(0.1)(x)
-
-    x = Conv2D(height, (1, 4), padding='same')(x)
-    x = BatchNormalization()(x)
-    x = LeakyReLU(alpha=0.2)(x)
-    attention_output = MultiHeadAttention(num_heads=2, key_dim=width/24, dropout=0.1)(x, x)
-    x = attention_output + x
-    x = AveragePooling2D((1, 2))(x)
-    x = Dropout(0.1)(x)
-
+    # Sixth block
     x = Conv2D(1, (1, 4), padding='same')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.2)(x)
-    attention_output = MultiHeadAttention(num_heads=1, key_dim=width/48, dropout=0.1)(x, x)
-    x = attention_output + x
     x = AveragePooling2D((1, 2))(x)
     x = Dropout(0.1)(x)
     return x
