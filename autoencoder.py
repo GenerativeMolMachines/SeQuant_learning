@@ -149,29 +149,106 @@ def latent_space(x: KerasTensor, latent_dim: int) -> tf.Tensor:
     return x
 
 
-def decoder(x: KerasTensor, height: int) -> tf.Tensor:
+def decoder(x: KerasTensor, height: int, width: int) -> tf.Tensor:
+    # First block
     x = Conv2DTranspose(1, (1, 4), strides=(1, 2), padding='same')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.2)(x)
 
-    x = Conv2DTranspose(height, (1, 4), strides=(1, 2), padding='same')(x)
+    # Second block
+    filters = height
+    width = width // 24
+    x = Conv2DTranspose(filters, (1, 4), strides=(1, 2), padding='same')(x)
+    x = BatchNormalization()(x)
+    x = LeakyReLU(alpha=0.2)(x)
+    x_permuted = Permute((2, 1, 3))(x)  # shape: (batch_size, width, height, filters)
+    batch_size = tf.shape(x_permuted)[0]
+    new_shape = tf.concat([[batch_size], [width], [height * filters]],
+                          axis=0)  # shape: (batch_size, width, height * filters)
+    x_reshaped = tf.reshape(x_permuted, new_shape)
+    attention_output = MultiHeadAttention(num_heads=2, key_dim=filters, dropout=0.1)(x_reshaped, x_reshaped)
+    new_shape_back = tf.concat([[batch_size], [width], [height], [filters]],
+                               axis=0)  # shape: (batch_size, width, height, filters)
+    attention_output_reshaped = tf.reshape(attention_output, new_shape_back)
+    attention_output_permuted_back = Permute((2, 1, 3))(
+        attention_output_reshaped)  # shape: (batch_size, height, width, filters)
+    x = attention_output_permuted_back + x
+
+    # Third block
+    filters = height * 2
+    width = width * 2
+    x = Conv2DTranspose(filters, (1, 4), strides=(1, 2), padding='same')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.2)(x)
 
-    x = Conv2DTranspose(height*2, (1, 4), strides=(1, 2), padding='same')(x)
+    x_permuted = Permute((2, 1, 3))(x)  # shape: (batch_size, width, height, filters)
+    batch_size = tf.shape(x_permuted)[0]
+    new_shape = tf.concat([[batch_size], [width], [height * filters]],
+                          axis=0)  # shape: (batch_size, width, height * filters)
+    x_reshaped = tf.reshape(x_permuted, new_shape)
+    attention_output = MultiHeadAttention(num_heads=4, key_dim=filters, dropout=0.1)(x_reshaped, x_reshaped)
+    new_shape_back = tf.concat([[batch_size], [width], [height], [filters]],
+                               axis=0)  # shape: (batch_size, width, height, filters)
+    attention_output_reshaped = tf.reshape(attention_output, new_shape_back)
+    attention_output_permuted_back = Permute((2, 1, 3))(
+        attention_output_reshaped)  # shape: (batch_size, height, width, filters)
+    x = attention_output_permuted_back + x
+
+    # Fourth block
+    filters = height * 4
+    width = width * 2
+    x = Conv2DTranspose(filters, (1, 4), strides=(1, 2), padding='same')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.2)(x)
 
-    x = Conv2DTranspose(height*4, (1, 4), strides=(1, 2), padding='same')(x)
-    x = BatchNormalization()(x)
-    x = LeakyReLU(alpha=0.2)(x)
+    x_permuted = Permute((2, 1, 3))(x)  # shape: (batch_size, width, height, filters)
+    batch_size = tf.shape(x_permuted)[0]
+    new_shape = tf.concat([[batch_size], [width], [height * filters]],
+                          axis=0)  # shape: (batch_size, width, height * filters)
+    x_reshaped = tf.reshape(x_permuted, new_shape)
+    attention_output = MultiHeadAttention(num_heads=4, key_dim=filters, dropout=0.1)(x_reshaped, x_reshaped)
+    new_shape_back = tf.concat([[batch_size], [width], [height], [filters]],
+                               axis=0)  # shape: (batch_size, width, height, filters)
+    attention_output_reshaped = tf.reshape(attention_output, new_shape_back)
+    attention_output_permuted_back = Permute((2, 1, 3))(
+        attention_output_reshaped)  # shape: (batch_size, height, width, filters)
+    x = attention_output_permuted_back + x
 
+    # Fifth block
+    filters = height * 8
+    width = width * 2
     x = Conv2DTranspose(height*8, (1, 4), strides=(1, 2), padding='same')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.2)(x)
 
+    x_permuted = Permute((2, 1, 3))(x)  # shape: (batch_size, width, height, filters)
+    batch_size = tf.shape(x_permuted)[0]
+    new_shape = tf.concat([[batch_size], [width], [height * filters]],
+                          axis=0)  # shape: (batch_size, width, height * filters)
+    x_reshaped = tf.reshape(x_permuted, new_shape)
+    attention_output = MultiHeadAttention(num_heads=4, key_dim=(filters // 2), dropout=0.1)(x_reshaped, x_reshaped)
+    new_shape_back = tf.concat([[batch_size], [width], [height], [filters]], axis=0)  # shape: (batch_size, width, height, filters)
+    attention_output_reshaped = tf.reshape(attention_output, new_shape_back)
+    attention_output_permuted_back = Permute((2, 1, 3))(attention_output_reshaped)  # shape: (batch_size, height, width, filters)
+    x = attention_output_permuted_back + x
+
+    # Sixth block
+    filters = height * 8
+    width = width * 3
     x = Conv2DTranspose(height*8, (1, 4), strides=(1, 3), padding='same')(x)
     x = BatchNormalization()(x)
+
+    x_permuted = Permute((2, 1, 3))(x)  # shape: (batch_size, width, height, filters)
+    batch_size = tf.shape(x_permuted)[0]
+    new_shape = tf.concat([[batch_size], [width], [height * filters]],
+                          axis=0)  # shape: (batch_size, width, height * filters)
+    x_reshaped = tf.reshape(x_permuted, new_shape)
+    attention_output = MultiHeadAttention(num_heads=4, key_dim=(filters // 2), dropout=0.1)(x_reshaped, x_reshaped)
+    new_shape_back = tf.concat([[batch_size], [width], [height], [filters]], axis=0)  # shape: (batch_size, width, height, filters)
+    attention_output_reshaped = tf.reshape(attention_output, new_shape_back)
+    attention_output_permuted_back = Permute((2, 1, 3))(attention_output_reshaped)  # shape: (batch_size, height, width, filters)
+    x = attention_output_permuted_back + x
+
     x = Activation('tanh')(x)
     return x
 
