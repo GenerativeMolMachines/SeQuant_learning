@@ -43,6 +43,10 @@ with open('data/test_seq_clean_str.pkl', 'rb') as f:
 with open('data/train_seq_clean_str.pkl', 'rb') as f:
     train_data = pickle.load(f)
 
+# Sampling
+train_data = train_data[:10000]
+test_data = test_data[:4300]
+
 # Oversampling
 train_data = oversampling(sequences=train_data, target_divisor=batch_size)
 test_data = oversampling(sequences=test_data, target_divisor=batch_size)
@@ -69,7 +73,7 @@ autoencoder = autoencoder_model(
 )
 
 # set checkpoint
-checkpoint_filepath = 'checkpoint/checkpoint_attention'
+checkpoint_filepath = 'checkpoint/checkpoint_attention_sample_test'
 model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
     filepath=checkpoint_filepath,
     save_weights_only=False,
@@ -91,11 +95,11 @@ history = autoencoder.fit(
     callbacks=[early_stop, model_checkpoint_callback]
 )
 
-with open('trainHistoryDict/attention.pkl', 'wb') as file_pi:
+with open('trainHistoryDict/attention_sample_test.pkl', 'wb') as file_pi:
     pickle.dump(history.history, file_pi)
 
 # load model learning history
-with open('trainHistoryDict/attention.pkl', 'rb') as f:
+with open('trainHistoryDict/attention_sample_test.pkl', 'rb') as f:
     learning_history = pickle.load(f)
 
 print("--- %s seconds ---" % (time.time() - start_time))
