@@ -1,4 +1,4 @@
 #!/bin/sh
-python3 autoencoder_learning_attention_batch.py > log_test_batch_size.txt
+python3 autoencoder_learning_attention_sample_batch.py > log_attention_sample_batch.txt
 
 

@@ -2,7 +2,7 @@ import os
 import time
 import pickle
 import numpy as np
-import matplotlib.pyplot as plt
+import pandas as pd
 
 import tensorflow as tf
 from autoencoder_preset_tools import (
@@ -36,12 +36,12 @@ tf.keras.backend.clear_session()
 tf.random.set_seed(2022)
 os.environ["KERAS_BACKEND"] = "tensorflow"
 
-# Loading balanced dataset
-with open('data/test_seq_clean_str.pkl', 'rb') as f:
-    test_data = pickle.load(f)
+# Loading balanced datasets
+protein_train = pd.read_csv('data/dna_rna/protein_train.csv')
+protein_test = pd.read_csv('data/dna_rna/protein_test.csv')
 
-with open('data/train_seq_clean_str.pkl', 'rb') as f:
-    train_data = pickle.load(f)
+train_data = list(protein_train['sequence'])
+test_data = list(protein_test['sequence'])
 
 # Oversampling
 train_data = oversampling(sequences=train_data, target_divisor=batch_size)
@@ -69,7 +69,7 @@ autoencoder = autoencoder_model(
 )
 
 # set checkpoint
-checkpoint_filepath = 'checkpoint/checkpoint_attention_sample_test'
+checkpoint_filepath = 'checkpoint/checkpoint_attention_sample_batch'
 model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
     filepath=checkpoint_filepath,
     save_weights_only=False,
@@ -91,11 +91,11 @@ history = autoencoder.fit(
     callbacks=[early_stop, model_checkpoint_callback]
 )
 
-with open('trainHistoryDict/attention_sample_test.pkl', 'wb') as file_pi:
+with open('trainHistoryDict/attention_sample_batch.pkl', 'wb') as file_pi:
     pickle.dump(history.history, file_pi)
 
 # load model learning history
-with open('trainHistoryDict/attention_sample_test.pkl', 'rb') as f:
+with open('trainHistoryDict/attention_sample_batch.pkl', 'rb') as f:
     learning_history = pickle.load(f)
 
 print("--- %s seconds ---" % (time.time() - start_time))
