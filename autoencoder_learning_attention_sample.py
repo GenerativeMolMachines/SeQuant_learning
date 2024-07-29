@@ -2,6 +2,7 @@ import os
 import time
 import pickle
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 
 import tensorflow as tf
@@ -36,16 +37,12 @@ tf.keras.backend.clear_session()
 tf.random.set_seed(2022)
 os.environ["KERAS_BACKEND"] = "tensorflow"
 
-# Loading balanced dataset
-with open('data/test_seq_clean_str.pkl', 'rb') as f:
-    test_data = pickle.load(f)
+# Loading balanced datasets
+protein_train = pd.read_csv('data/dna_rna/protein_train.csv')
+protein_test = pd.read_csv('data/dna_rna/protein_test.csv')
 
-with open('data/train_seq_clean_str.pkl', 'rb') as f:
-    train_data = pickle.load(f)
-
-# Sampling
-train_data = train_data[:10000]
-test_data = test_data[:4300]
+train_data = list(protein_train['sequence'])
+test_data = list(protein_test['sequence'])
 
 # Oversampling
 train_data = oversampling(sequences=train_data, target_divisor=batch_size)
@@ -57,7 +54,6 @@ np.random.shuffle(test_data)
 # Batching
 train_batches = [train_data[i:i + batch_size] for i in range(0, len(train_data), batch_size)]
 test_batches = [test_data[i:i + batch_size] for i in range(0, len(test_data), batch_size)]
-
 
 # tf.data.Dataset creation
 train_dataset = create_dataset_from_batches(batches=train_batches, monomer_dict=monomer_dict, max_len=max_len)
