@@ -6,10 +6,8 @@ import pandas as pd
 
 import tensorflow as tf
 from autoencoder_preset_tools import (
-    make_monomer_descriptors,
-    seq_to_matrix,
-    encode_seqs,
-    preprocess_input,
+    create_dataset_from_batches,
+    oversampling
 )
 from autoencoder_batch import autoencoder_model
 
@@ -42,29 +40,23 @@ os.environ["KERAS_BACKEND"] = "tensorflow"
 protein_train = pd.read_csv('data/dna_rna/protein_train.csv')
 protein_test = pd.read_csv('data/dna_rna/protein_test.csv')
 
-# Use functions for protein datasets
-descriptors_set = make_monomer_descriptors(monomer_dict)
-#
-protein_train_encoded_sequences = encode_seqs(protein_train['sequence'].tolist(), descriptors_set, max_len)
-protein_train_encoded_sequences = np.moveaxis(protein_train_encoded_sequences, -1, 0)
+train_data = list(protein_train['sequence'])
+test_data = list(protein_test['sequence'])
 
-protein_test_encoded_sequences = encode_seqs(protein_test['sequence'].tolist(), descriptors_set, max_len)
-protein_test_encoded_sequences = np.moveaxis(protein_test_encoded_sequences, -1, 0)
+# Oversampling
+train_data = oversampling(sequences=train_data, target_divisor=batch_size)
+test_data = oversampling(sequences=test_data, target_divisor=batch_size)
 
-# check if transformation is correct
-protein_test_list = protein_test['sequence'].tolist()
-assert np.all(
-    seq_to_matrix(
-        sequence=protein_test_list[0],
-        descriptors=descriptors_set,
-        num=max_len
-    ) == protein_test_encoded_sequences[0, :, :]
-)
+np.random.shuffle(train_data)
+np.random.shuffle(test_data)
 
-X_train = protein_train_encoded_sequences
-X_train = preprocess_input(X_train)
-X_test = protein_test_encoded_sequences
-X_test = preprocess_input(X_test)
+# Batching
+train_batches = [train_data[i:i + batch_size] for i in range(0, len(train_data), batch_size)]
+test_batches = [test_data[i:i + batch_size] for i in range(0, len(test_data), batch_size)]
+
+# tf.data.Dataset creation
+train_dataset = create_dataset_from_batches(batches=train_batches, monomer_dict=monomer_dict, max_len=max_len)
+test_dataset = create_dataset_from_batches(batches=test_batches, monomer_dict=monomer_dict, max_len=max_len)
 
 # model init
 autoencoder = autoencoder_model(
@@ -91,10 +83,9 @@ start_time = time.time()
 
 # Training
 history = autoencoder.fit(
-    X_train,
-    X_train,
+    train_dataset,
     epochs=epochs,
-    validation_data=(X_test, X_test),
+    validation_data=test_dataset,
     verbose=2,
     callbacks=[early_stop, model_checkpoint_callback]
 )
