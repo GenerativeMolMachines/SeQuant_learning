@@ -74,7 +74,7 @@ def latent_space(x: KerasTensor, latent_dim: int) -> tf.Tensor:
     x = Dense(latent_dim, name='Latent')(x)
     x = Dense(units)(x)
     x = LeakyReLU(alpha=0.2)(x)
-    x = Reshape((latent_dim, 1, 1))(x)
+    x = Reshape((latent_dim, 1, -1))(x)
     return x
 
 
