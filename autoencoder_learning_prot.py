@@ -105,17 +105,16 @@ autoencoder = autoencoder_model(
 )
 
 # set checkpoint
-checkpoint_filepath = 'checkpoint/checkpoint_all_polymers'
+checkpoint_filepath = 'checkpoint/checkpoint_aptamer'
 model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
     filepath=checkpoint_filepath,
     save_weights_only=False,
     monitor='val_loss',
-    mode='max',
+    mode='min',
     save_best_only=True
 )
 
 early_stop = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
-
 # Training
 
 history = autoencoder.fit(
@@ -127,11 +126,8 @@ history = autoencoder.fit(
     callbacks=[early_stop, model_checkpoint_callback]
 )
 
-with open('trainHistoryDict/protein.pkl', 'wb') as file_pi:
+with open('trainHistoryDict/history_aptamer_protein.pkl', 'wb') as file_pi:
     pickle.dump(history.history, file_pi)
 
-# load model learning history
-with open('trainHistoryDict/protein.pkl', 'rb') as f:
-    learning_history = pickle.load(f)
 
 print("--- %s seconds ---" % (time.time() - start_time))

@@ -48,12 +48,6 @@ monomer_dict = {
     'U': 'C(C(C(=O)O)N)[Se]'
 }
 # hyperparameters
-# height = 43
-# width = 96
-# channels = 1
-# latent_dim = height
-# learning_rate = 1e-3
-# batch_size = 10
 epochs = 100
 tf.keras.backend.clear_session()
 tf.random.set_seed(2022)
@@ -110,15 +104,15 @@ start_time = time.time()
 gpus = tf.config.list_logical_devices('GPU')
 strategy = tf.distribute.MirroredStrategy(gpus)
 with strategy.scope():
-    autoencoder = tf.keras.models.load_model('checkpoint/checkpoint_all_polymers')
+    autoencoder = tf.keras.models.load_model('checkpoint/checkpoint_aptamer')
 
     # set checkpoint
-    checkpoint_filepath = 'checkpoint/checkpoint_aptamers'
+    checkpoint_filepath = 'checkpoint/checkpoint_all_polymers'
     model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
         filepath=checkpoint_filepath,
         save_weights_only=False,
         monitor='val_loss',
-        mode='max',
+        mode='min',
         save_best_only=True
     )
 
@@ -135,11 +129,8 @@ with strategy.scope():
         callbacks=[early_stop, model_checkpoint_callback]
     )
 
-with open('trainHistoryDict/aptamers.pkl', 'wb') as file_pi:
+with open('trainHistoryDict/history_aptamers.pkl', 'wb') as file_pi:
     pickle.dump(history.history, file_pi)
 
-# load model learning history
-with open('trainHistoryDict/aptamers.pkl', 'rb') as f:
-    learning_history = pickle.load(f)
 
 print("--- %s seconds ---" % (time.time() - start_time))
