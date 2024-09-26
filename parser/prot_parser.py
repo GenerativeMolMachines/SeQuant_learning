@@ -21,6 +21,11 @@ proxies_list = [
         '919.919.919.919:0000'
     ]
 
+with open('test_seq_clean_str.pkl', 'rb') as f:
+    test_data = pickle.load(f)
+
+print("test_data_len = " + len(test_data))
+
 
 # Step 1: Perform the search to get the IDs of matching sequences
 def parser_by_len(
@@ -94,7 +99,7 @@ def parser_by_len(
             for b in sequences_text:
                 c = b.split('\n')
                 s = c[-1]
-                if s not in seq_list and set(s).issubset(aa_set):
+                if (s not in seq_list) and (set(s).issubset(aa_set)) and (s not in test_data):
                     seq_list.append(s)
         else:
             print(f"Failed to fetch sequences length={length}: {response.status_code} - {response.reason}")
