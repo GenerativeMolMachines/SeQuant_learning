@@ -24,7 +24,7 @@ proxies_list = [
 with open('test_seq_clean_str.pkl', 'rb') as f:
     test_data = pickle.load(f)
 
-print("test_data_len = " + len(test_data))
+print("test_data_len = " + str(len(test_data)))
 
 
 # Step 1: Perform the search to get the IDs of matching sequences
