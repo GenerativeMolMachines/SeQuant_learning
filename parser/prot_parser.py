@@ -1,6 +1,8 @@
 import pickle
+import random
 import requests
 import numpy as np
+import time
 
 
 base_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
@@ -8,15 +10,24 @@ search_url = base_url + "esearch.fcgi"
 fetch_url = base_url + "efetch.fcgi"
 aa_set = {'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L',
               'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'Y'}
+proxies_list = [
+        '111.111.111.111:2222',
+        '333.333.333.333:4444',
+        '444.444.444.444:5555',
+        '777.777.777.777:8888',
+        '8888.8888.8888.8888:777',
+        '444.333.444.333:5555',
+        '777.5555.5555.777:8888',
+        '919.919.919.919:0000'
+    ]
 
 
 # Step 1: Perform the search to get the IDs of matching sequences
 def parser_by_len(
     length: int,
-    retmax: int = 400000,
-    arrays_amount: int = 9000,
+    retmax: int = 500000,
     max_samples_amount: int = 80000,
-    path_to_save: str = 'data/pkl_from_parser_prl'
+    path_to_save: str = 'data/parse_bad_len_sep'
 ):
     """
     Parser for protein sequences from NCBI. Saves file in dir permanently.
@@ -34,7 +45,10 @@ def parser_by_len(
         "retmax": retmax,  # Adjust retmax as needed
         "retmode": "json"
     }
-    response = requests.get(search_url, params=search_params)
+    proxies = {
+        'http': random.choice(proxies_list)
+    }
+    response = requests.get(search_url, params=search_params, proxies=proxies)
     search_results = response.json()
 
     if search_results.get('error', '') != '':
@@ -50,11 +64,12 @@ def parser_by_len(
 
     id_list = search_results["esearchresult"]["idlist"]
     # num of arrays (9k for here) depends on retmax, num of val in arr must be <100
-    several_id_lists = np.array_split(np.asarray(id_list), arrays_amount)
+    several_id_lists = np.array_split(np.asarray(id_list), int(len(id_list) / 50) + 1)
+
     seq_list = []
     # Step 2: Fetch the sequences using the IDs
     for id_l in several_id_lists:
-        if len(seq_list) > max_samples_amount: # 80k - num which we need, could be changed
+        if len(seq_list) > max_samples_amount:  # 80k - num which we need, could be changed
             print('more then break')
             break
         fetch_params = {
@@ -65,15 +80,20 @@ def parser_by_len(
         }
 
         try:
-            response = requests.get(fetch_url, params=fetch_params)
+            proxies = {
+                'http': random.choice(proxies_list)
+            }
+            time.sleep(1)
+            response = requests.get(fetch_url, params=fetch_params, proxies=proxies)
         except:
             continue
 
         if response.ok:
             sequences_text = response.text.split('\n\n')[:-1]
+
             for b in sequences_text:
                 c = b.split('\n')
-                s = c[1] + c[2]
+                s = c[-1]
                 if s not in seq_list and set(s).issubset(aa_set):
                     seq_list.append(s)
         else:
