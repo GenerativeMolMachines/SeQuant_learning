@@ -30,7 +30,7 @@ print("test_data_len = " + str(len(test_data)))
 # Step 1: Perform the search to get the IDs of matching sequences
 def parser_by_len(
     length: int,
-    retmax: int = 500000,
+    retmax: int = 600000,
     max_samples_amount: int = 80000,
     path_to_save: str = 'data/parse_bad_len_sep'
 ):
@@ -67,7 +67,8 @@ def parser_by_len(
         print(f"No sequences found with the specified length={length}.")
         return
 
-    id_list = search_results["esearchresult"]["idlist"]
+    id_list = list(set(search_results["esearchresult"]["idlist"]))
+    print(f"length={length} has {len(id_list)} ids")
     # num of arrays (9k for here) depends on retmax, num of val in arr must be <100
     several_id_lists = np.array_split(np.asarray(id_list), int(len(id_list) / 50) + 1)
 
@@ -91,6 +92,7 @@ def parser_by_len(
             time.sleep(1)
             response = requests.get(fetch_url, params=fetch_params, proxies=proxies)
         except:
+            print(f"Bad response length={length}")
             continue
 
         if response.ok:
