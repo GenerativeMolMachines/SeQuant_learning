@@ -10,17 +10,6 @@ search_url = base_url + "esearch.fcgi"
 fetch_url = base_url + "efetch.fcgi"
 aa_set = {'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L',
               'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'Y'}
-proxies_list = [
-        '111.111.111.111:2222',
-        '333.333.333.333:4444',
-        '444.444.444.444:5555',
-        '777.777.777.777:8888',
-        '8888.8888.8888.8888:777',
-        '444.333.444.333:5555',
-        '777.5555.5555.777:8888',
-        '919.919.919.919:0000'
-    ]
-
 with open('test_seq_clean_str.pkl', 'rb') as f:
     test_data = pickle.load(f)
 
@@ -50,10 +39,7 @@ def parser_by_len(
         "retmax": retmax,  # Adjust retmax as needed
         "retmode": "json"
     }
-    proxies = {
-        'http': random.choice(proxies_list)
-    }
-    response = requests.get(search_url, params=search_params, proxies=proxies)
+    response = requests.get(search_url, params=search_params)
     search_results = response.json()
 
     if search_results.get('error', '') != '':
@@ -86,11 +72,8 @@ def parser_by_len(
         }
 
         try:
-            proxies = {
-                'http': random.choice(proxies_list)
-            }
             time.sleep(1)
-            response = requests.get(fetch_url, params=fetch_params, proxies=proxies)
+            response = requests.get(fetch_url, params=fetch_params)
         except:
             print(f"Bad response length={length}")
             continue
