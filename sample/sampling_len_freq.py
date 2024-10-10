@@ -93,8 +93,24 @@ def stratified_sampling_with_clustering(
     df, final_num_clusters = clustering(df, sequence_column=sequence_column, n_clusters=n_clusters)
     df['length'] = df[sequence_column].apply(len)
 
-    # Define unique groups by length and cluster
-    df['group'] = df.apply(lambda row: (row['length'], row['combined_cluster']), axis=1)
+    # Define ranges for lengths
+    max_length = df['length'].max()
+    min_length = df['length'].min()
+
+    # Create length bins excluding 6
+    length_bins = list(range(10, max_length + 1, 10))
+
+    # Assign lengths to bins using a loop
+    def assign_length_group(length):
+        for bin_value in length_bins:
+            if length < bin_value:
+                return bin_value
+        return max_length
+
+    df['length_group'] = df['length'].apply(assign_length_group)
+
+    # Define unique groups by length group and cluster
+    df['group'] = df.apply(lambda row: (row['length_group'], row['combined_cluster']), axis=1)
     unique_groups = df['group'].unique()
 
     small_sampled_dataframes = []
@@ -128,8 +144,16 @@ def stratified_sampling_with_clustering(
         remaining_after_medium = group_df.drop(small_sampled_group_df.index).drop(medium_sampled_group_df.index)
         if min_group_size > 0:
             large_sampled_group_df = remaining_after_medium.sample(
-                n=int(min_group_size*(1 - small_fraction - medium_fraction)), random_state=random_state)
+                n=int(min_group_size * (1 - small_fraction - medium_fraction)), random_state=random_state)
             large_sampled_dataframes.append(large_sampled_group_df)
+
+    print(f"Unique groups: {unique_groups}")
+    print(f"Min group size: {min_group_size}")
+    print(f"Small sample size: {small_sample_size}, Medium sample size: {medium_sample_size}")
+
+    print(f"Small sampled dataframes count: {len(small_sampled_dataframes)}")
+    print(f"Medium sampled dataframes count: {len(medium_sampled_dataframes)}")
+    print(f"Large sampled dataframes count: {len(large_sampled_dataframes)}")
 
     # Merge all samples
     small_sampled_df = pd.concat(small_sampled_dataframes).reset_index(drop=True)
@@ -137,7 +161,7 @@ def stratified_sampling_with_clustering(
     large_sampled_df = pd.concat(large_sampled_dataframes).reset_index(drop=True)
 
     return small_sampled_df, medium_sampled_df, large_sampled_df
-
+    
 
 # Functions implementation
 small_train_df, medium_train_df, large_train_df = stratified_sampling_with_clustering(
