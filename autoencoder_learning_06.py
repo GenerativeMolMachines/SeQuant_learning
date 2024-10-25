@@ -32,7 +32,7 @@ depth = 6
 channels = 1
 latent_dim = height
 batch_size = 32
-epochs = 100
+epochs = 50
 tf.keras.backend.clear_session()
 tf.random.set_seed(2022)
 os.environ["KERAS_BACKEND"] = "tensorflow"
@@ -62,8 +62,7 @@ small_test_dataset = create_dataset_from_batches(batches=small_test_batches, mon
 
 def build_model(hp):
     learning_rate = hp.Float('learning_rate', min_value=1e-4, max_value=1e-2, sampling='log')
-    filter_strategy = hp.Choice('filter_strategy', ['exponential', 'linear', 'height'])
-    paddings = hp.Choice('padding', ['same', 'valid'])
+    filter_strategy = hp.Choice('filter_strategy', ['10_height', '8_height', '4_height'])
     activation_name = hp.Choice(
         'activation', ['relu', 'leaky_relu', 'sigmoid', 'softmax', 'softplus', 'tanh', 'log_softmax', 'exponential']
     )
@@ -78,7 +77,6 @@ def build_model(hp):
         latent_dim=latent_dim,
         learning_rate=learning_rate,
         filter_strategy=filter_strategy,
-        paddings=paddings,
         activation_name=activation_name,
         dropout_rate=dropout_rate,
 
@@ -93,7 +91,7 @@ tuner = keras_tuner.Hyperband(
     max_epochs=epochs,
     factor=3,
     directory='tuning_results',
-    project_name='depth_6'
+    project_name='filt_decr_depth_6'
 )
 
 # set checkpoint
