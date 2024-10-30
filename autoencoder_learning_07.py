@@ -113,7 +113,7 @@ for strategy in filter_strategy:
         pickle.dump(history.history, file_pi)
 
     # load model learning history
-    with open(f'trainHistoryDict/0{strategy}.pkl', 'rb') as f:
+    with open(f'trainHistoryDict/{strategy}.pkl', 'rb') as f:
         learning_history = pickle.load(f)
 
     print("--- %s seconds ---" % (time.time() - start_time))
