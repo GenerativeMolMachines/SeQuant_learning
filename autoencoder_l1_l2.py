@@ -19,7 +19,7 @@ from keras.engine.keras_tensor import KerasTensor
 def encoder(x: KerasTensor, height: int) -> tf.Tensor:
     # First block
     filters = height * 1
-    x = Conv2D(filters, (1, 4), padding='same')(x) # input: (None, 46, 96, 1) output: (None, 46, 96, 46)
+    x = Conv2D(filters, (1, 4), padding='same', kernel_regularizer='l1_l2')(x) # input: (None, 46, 96, 1) output: (None, 46, 96, 46)
     x = BatchNormalization()(x) # output: (None, 46, 96, 46)
     x = LeakyReLU(alpha=0.2)(x) # output: (None, 46, 96, 46)
     x = AveragePooling2D((1, 3))(x) # output: (None, 46, 32, 46)
@@ -27,7 +27,7 @@ def encoder(x: KerasTensor, height: int) -> tf.Tensor:
 
     # Second block
     filters = height * 2
-    x = Conv2D(filters, (1, 4), padding='same')(x) # output: (None, 46, 32, 92)
+    x = Conv2D(filters, (1, 4), padding='same', kernel_regularizer='l1_l2')(x) # output: (None, 46, 32, 92)
     x = BatchNormalization()(x) # output: (None, 46, 32, 92)
     x = LeakyReLU(alpha=0.2)(x) # output: (None, 46, 32, 92)
     x = AveragePooling2D((1, 2))(x) # output: (None, 46, 16, 92)
@@ -35,7 +35,7 @@ def encoder(x: KerasTensor, height: int) -> tf.Tensor:
 
     # Third block
     filters = height * 4
-    x = Conv2D(filters, (1, 4), padding='same')(x) # output: (None, 46, 16, 184)
+    x = Conv2D(filters, (1, 4), padding='same', kernel_regularizer='l1_l2')(x) # output: (None, 46, 16, 184)
     x = BatchNormalization()(x) # output: (None, 46, 16, 184)
     x = LeakyReLU(alpha=0.2)(x) # output: (None, 46, 16, 184)
     x = AveragePooling2D((1, 2))(x) # output: (None, 46, 8, 184)
@@ -43,7 +43,7 @@ def encoder(x: KerasTensor, height: int) -> tf.Tensor:
 
     # Fourth block
     filters = height * 6
-    x = Conv2D(filters, (1, 4), padding='same')(x) # output: (None, 46, 8, 276)
+    x = Conv2D(filters, (1, 4), padding='same', kernel_regularizer='l1_l2')(x) # output: (None, 46, 8, 276)
     x = BatchNormalization()(x) # output: (None, 46, 8, 276)
     x = LeakyReLU(alpha=0.2)(x) # output: (None, 46, 8, 276)
     x = AveragePooling2D((1, 2))(x) # output: (None, 46, 4, 276)
@@ -51,7 +51,7 @@ def encoder(x: KerasTensor, height: int) -> tf.Tensor:
 
     # Fifth block
     filters = height * 8
-    x = Conv2D(filters, (1, 4), padding='same')(x) # output: (None, 46, 4, 368)
+    x = Conv2D(filters, (1, 4), padding='same', kernel_regularizer='l1_l2')(x) # output: (None, 46, 4, 368)
     x = BatchNormalization()(x) # output: (None, 46, 4, 368)
     x = LeakyReLU(alpha=0.2)(x) # output: (None, 46, 4, 368)
     x = AveragePooling2D((1, 2))(x) # output: (None, 46, 2, 368)
@@ -59,7 +59,7 @@ def encoder(x: KerasTensor, height: int) -> tf.Tensor:
 
     # Sixth block
     filters = height * 10
-    x = Conv2D(filters, (1, 4), padding='same')(x) # output: (None, 46, 2, 460)
+    x = Conv2D(filters, (1, 4), padding='same', kernel_regularizer='l1_l2')(x) # output: (None, 46, 2, 460)
     x = BatchNormalization()(x) # output: (None, 46, 2, 460)
     x = LeakyReLU(alpha=0.2)(x) # output: (None, 46, 2, 460)
     x = AveragePooling2D((1, 2))(x) # output: (None, 46, 1, 460)
@@ -81,37 +81,37 @@ def latent_space(x: KerasTensor, latent_dim: int) -> tf.Tensor:
 def decoder(x: KerasTensor, height: int) -> tf.Tensor:
     # First block
     filters = height * 10
-    x = Conv2DTranspose(filters, (1, 4), strides=(1, 2), padding='same')(x)
+    x = Conv2DTranspose(filters, (1, 4), strides=(1, 2), padding='same', kernel_regularizer='l1_l2')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.2)(x)
 
     # Second block
     filters = height * 8
-    x = Conv2DTranspose(filters, (1, 4), strides=(1, 2), padding='same')(x)
+    x = Conv2DTranspose(filters, (1, 4), strides=(1, 2), padding='same', kernel_regularizer='l1_l2')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.2)(x)
 
     # Third block
     filters = height * 6
-    x = Conv2DTranspose(filters, (1, 4), strides=(1, 2), padding='same')(x)
+    x = Conv2DTranspose(filters, (1, 4), strides=(1, 2), padding='same', kernel_regularizer='l1_l2')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.2)(x)
 
     # Fourth block
     filters = height * 4
-    x = Conv2DTranspose(filters, (1, 4), strides=(1, 2), padding='same')(x)
+    x = Conv2DTranspose(filters, (1, 4), strides=(1, 2), padding='same', kernel_regularizer='l1_l2')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.2)(x)
 
     # Fifth block
     filters = height * 2
-    x = Conv2DTranspose(filters, (1, 4), strides=(1, 2), padding='same')(x)
+    x = Conv2DTranspose(filters, (1, 4), strides=(1, 2), padding='same', kernel_regularizer='l1_l2')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.2)(x)
 
     # Sixth block
     filters = height * 1
-    x = Conv2DTranspose(filters, (1, 4), strides=(1, 3), padding='same')(x)
+    x = Conv2DTranspose(filters, (1, 4), strides=(1, 3), padding='same', kernel_regularizer='l1_l2')(x)
     x = BatchNormalization()(x)
     x = Activation('tanh')(x)
     return x
