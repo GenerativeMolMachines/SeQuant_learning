@@ -18,11 +18,10 @@ env:
 inputs:
   - data/large_train_df.csv: TRAIN
   - data/large_test_df.csv: TEST
-  - checkpoint/checkpoint_l1_l2: CHECKPOINT
-  - trainHistoryDict/l1_l2.pkl: OUTPUT
 
 outputs:
-  - WEIGHTS:
+  - checkpoint/checkpoint_l1_l2: CHECKPOINT
+  - trainHistoryDict/l1_l2.pkl: OUTPUT
 
 cloud-instance-types:
   - g1.4
