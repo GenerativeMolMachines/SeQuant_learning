@@ -10,10 +10,10 @@ cmd: >
     --output ${OUTPUT}
 
 env:
-  python:
-    type: manual
-    version: 3.10.5
-    requirements-file: requirements.txt
+  python: auto
+    # type: manual
+    # version: 3.10.5
+    # requirements-file: requirements.txt
 
 inputs:
   - data/large_train_df.csv: TRAIN
