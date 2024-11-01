@@ -2,7 +2,7 @@ import argparse
 from autoencoder_learning_l1_l2 import learn_l1_l2
 
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(prog="yc-ds-entrypoint")
 parser.add_argument('--train', required=True, help='train dataset path')
 parser.add_argument('--test', required=True, help='test dataset path')
 parser.add_argument('--checkpoint', required=True, help='model checkpoint file path')

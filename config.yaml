@@ -3,11 +3,7 @@ name: sequant-learning
 desc: create jobs for SeQuant
 
 cmd: >
-  python3 yc-ds-entrypoint.py \ 
-    --train ${TRAIN} \
-    --test ${TEST} \
-    --checkpoint ${CHECKPOINT} \
-    --output ${OUTPUT}
+  python yc-ds-entrypoint.py --train ${TRAIN} --test ${TEST} --checkpoint ${CHECKPOINT} --output ${OUTPUT}
 
 env:
   python: auto
