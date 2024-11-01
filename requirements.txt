@@ -1,0 +1,16 @@
+pandas
+numpy
+tensorflow
+biopython
+absl-py
+rdkit
+pandas
+scikit-learn
+tensorflow-io-gcs-filesystem
+tensorflow
+rdkit-pypi
+peptides
+tqdm
+lazypredict
+matplotlib
+keras

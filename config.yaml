@@ -1,0 +1,34 @@
+name: sequant-learning
+
+desc: create jobs for SeQuant
+
+cmd: >
+  python3 yc-ds-entrypoint.py \ 
+    --train ${TRAIN} \
+    --test ${TEST} \
+    --checkpoint ${CHECKPOINT} \
+    --output ${OUTPUT}
+
+env:
+  python:
+    type: manual
+    version: 3.10.5
+    requirements-file: requirements.txt
+
+inputs:
+  - data/large_train_df.csv: TRAIN
+  - data/large_test_df.csv: TEST
+  - checkpoint/checkpoint_l1_l2: CHECKPOINT
+  - trainHistoryDict/l1_l2.pkl: OUTPUT
+
+outputs:
+  - WEIGHTS:
+
+cloud-instance-types:
+  - g2.8
+  - g2.4
+
+graceful-shutdown:
+  signal: SIGTERM
+  timeout: 15s
+
