@@ -10,7 +10,7 @@ from autoencoder_preset_tools import (
     create_dataset_from_batches,
     oversampling
 )
-from autoencoder_06 import autoencoder_model
+from autoencoder_09 import autoencoder_model
 
 
 # variables
