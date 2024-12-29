@@ -103,7 +103,7 @@ def decoder(z: tf.Tensor, height: int, depth: int, n_values: list, filter_strate
 
 
 def vae_loss(original_inputs, outputs, mu, log_var):
-    reconstruction_loss = tf.reduce_mean(tf.keras.losses.mean_squared_error(original_inputs, outputs))
+    reconstruction_loss = tf.keras.losses.mean_squared_error(original_inputs, outputs)
     z_q = mu + tf.exp(0.5 * log_var) * tf.random.normal(tf.shape(mu))
     z_p = tf.random.normal(tf.shape(mu))
     distances = tf.norm(tf.expand_dims(z_q, axis=1) - tf.expand_dims(z_p, axis=0), axis=-1)
