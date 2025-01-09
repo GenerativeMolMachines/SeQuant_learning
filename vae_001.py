@@ -105,7 +105,9 @@ def decoder(z: tf.Tensor, height: int, depth: int, n_values: list, filter_strate
 def vae_loss(original_inputs, outputs, mu, log_var):
     reconstruction_loss = tf.keras.losses.mean_squared_error(original_inputs, outputs)
     kl_loss = -0.5 * tf.reduce_sum(1 + log_var - tf.square(mu) - tf.exp(log_var), axis=-1)
-
+    print(f'Reconstruction loss: {reconstruction_loss}')
+    print(f'KL loss: {kl_loss}')
+    print(tf.reduce_mean(reconstruction_loss + kl_loss))
     return tf.reduce_mean(reconstruction_loss + kl_loss)
 
 
