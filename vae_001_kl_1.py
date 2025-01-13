@@ -49,7 +49,7 @@ def encoder(
 
     if noise:
         stddev = tf.abs(x) * noise_factor
-        noise_tensor = tf.random.normal(shape=tf.shape(x), mean=0.0, stddev=stddev)
+        noise_tensor = tf.random.normal(shape=tf.shape(x), mean=0.0, stddev=stddev, seed=42)
         x = tf.add(x, noise_tensor)
 
     n_values = []
