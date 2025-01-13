@@ -9,7 +9,7 @@ from autoencoder_preset_tools import (
     create_dataset_from_batches,
     oversampling
 )
-from vae_001 import autoencoder_model
+from vae_001_kl_1 import autoencoder_model
 
 
 # variables
@@ -32,7 +32,7 @@ channels = 1
 latent_dim = height
 learning_rate = 1e-3
 batch_size = 32
-epochs = 50
+epochs = 30
 tf.keras.backend.clear_session()
 tf.random.set_seed(2022)
 os.environ["KERAS_BACKEND"] = "tensorflow"
@@ -100,7 +100,7 @@ for strategy in filter_strategy:
     )
 
     # set checkpoint
-    checkpoint_filepath = f'checkpoint/checkpoint_vae_001'
+    checkpoint_filepath = f'checkpoint/checkpoint_vae_001_kl_1'
     model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
         filepath=checkpoint_filepath,
         save_weights_only=False,
@@ -122,16 +122,16 @@ for strategy in filter_strategy:
         callbacks=[early_stop, model_checkpoint_callback]
     )
 
-    with open(f'trainHistoryDict/vae_001.pkl', 'wb') as file_pi:
+    with open(f'trainHistoryDict/vae_001_kl_1.pkl', 'wb') as file_pi:
         pickle.dump(history.history, file_pi)
 
     # load model learning history
-    with open(f'trainHistoryDict/vae_001.pkl', 'rb') as f:
+    with open(f'trainHistoryDict/vae_001_kl_1.pkl', 'rb') as f:
         learning_history = pickle.load(f)
 
     print("--- %s seconds ---" % (time.time() - start_time))
     print()
-
+"""
     # Embeddings calculation
     latent_layer_name = 'Latent'
     latent_model = tf.keras.Model(inputs=autoencoder.input, outputs=autoencoder.get_layer(latent_layer_name).output)
@@ -140,5 +140,5 @@ for strategy in filter_strategy:
 
     embeddings_filepath = os.path.join(embeddings_dir, f'vae_embeddings_{strategy}_1000.csv')
     pd.DataFrame(embeddings).to_csv(embeddings_filepath, index=False)
-
+"""
 print('Learning has been finished')
