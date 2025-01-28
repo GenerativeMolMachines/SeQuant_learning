@@ -93,7 +93,7 @@ def latent_space(x: tf.Tensor, latent_dim: int) -> tuple[tf.Tensor, tf.Tensor, t
 def decoder(z: tf.Tensor, height: int, depth: int, n_values: list, filter_strategy: str) -> tf.Tensor:
     for i in range(1, depth+1):
         n = n_values[-i]
-        count_list = list(number for number in range(1, 7))
+        count_list = list(number for number in range(1, depth))
         filters = get_filter_count(filter_strategy, height, count_list[-i], depth)
         z = Conv2DTranspose(filters, (1, 4), strides=(1, n), padding='same')(z)
         z = BatchNormalization()(z)
