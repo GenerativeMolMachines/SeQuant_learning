@@ -117,8 +117,7 @@ def autoencoder_model(
         noise: bool = False, noise_factor: float = 0.1
 ) -> tf.keras.Model:
     gpus = tf.config.list_logical_devices('GPU')
-    strategy = tf.distribute.MirroredStrategy(gpus)
-    with strategy.scope():
+    with tf.device(gpus[1].name):
         inputs = Input(shape=(height, width, channels))
         x = inputs
         x, n_values = encoder(x, height, width, depth, filter_strategy, noise, noise_factor)
