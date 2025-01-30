@@ -9,7 +9,7 @@ from autoencoder_preset_tools import (
     create_dataset_from_batches,
     oversampling
 )
-from vae_004 import autoencoder_model
+from vae_007 import autoencoder_model
 
 
 # variables
