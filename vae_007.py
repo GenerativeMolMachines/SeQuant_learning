@@ -71,6 +71,7 @@ def encoder(
 
 
 def latent_space(x: tf.Tensor, latent_dim: int) -> tuple[tf.Tensor, tf.Tensor, tf.Tensor]:
+    height, width, filters = x.shape[1], x.shape[2], x.shape[3]
     x = Flatten()(x)
     units = x.shape[1]
 
@@ -88,7 +89,7 @@ def latent_space(x: tf.Tensor, latent_dim: int) -> tuple[tf.Tensor, tf.Tensor, t
 
     z_expanded = Dense(units)(z)
     z_expanded = LeakyReLU(alpha=0.2)(z_expanded)
-    z_expanded = Reshape((latent_dim, 1, -1))(z_expanded)
+    z_expanded = Reshape((height, width, filters))(z_expanded)
 
     return z_expanded, mu, log_var
 
