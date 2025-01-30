@@ -87,8 +87,9 @@ def latent_space(x: tf.Tensor, latent_dim: int) -> tuple[tf.Tensor, tf.Tensor, t
     z = Lambda(sampling, name='Latent')([mu, log_var])
 
     z_expanded = Dense(units)(z)
-    z_expanded = LeakyReLU(alpha=0.2)(z_expanded)
     filters = units // latent_dim
+    if units % (latent_dim * 1) != 0:
+        raise ValueError("Размерности не согласуются.")
     z_expanded = Reshape((latent_dim, 1, filters))(z_expanded)
 
     return z_expanded, mu, log_var
