@@ -108,7 +108,7 @@ def vae_loss(original_inputs, outputs, mu, log_var):
     reconstruction_loss = tf.reduce_mean(tf.keras.losses.mean_squared_error(original_inputs, outputs))
     kl_loss = -0.5 * tf.reduce_sum(1 + log_var - tf.square(mu) - tf.exp(log_var), axis=-1)
     summarized_loss = reconstruction_loss + (1 * kl_loss)
-    return summarized_loss
+    return summarized_loss, reconstruction_loss, kl_loss
 
 
 def autoencoder_model(
@@ -117,14 +117,27 @@ def autoencoder_model(
         noise: bool = False, noise_factor: float = 0.1
 ) -> tf.keras.Model:
     gpus = tf.config.list_logical_devices('GPU')
-    with tf.device(gpus[1].name):
+    strategy = tf.distribute.MirroredStrategy(gpus)
+    with strategy.scope():
         inputs = Input(shape=(height, width, channels))
         x = inputs
         x, n_values = encoder(x, height, width, depth, filter_strategy, noise, noise_factor)
         z, mu, log_var = latent_space(x, latent_dim)
         outputs = decoder(z, height, depth, n_values, filter_strategy)
+
         vae = Model(inputs, outputs, name='Variational_Autoencoder')
-        vae.add_loss(vae_loss(inputs, outputs, mu, log_var))
+
+        # Compute the losses
+        total_loss, reconstruction_loss, kl_loss = vae_loss(
+            inputs, outputs, mu, log_var
+        )
+
+        # Add custom loss
+        vae.add_loss(total_loss)
+
+        # Add metrics for monitoring
+        vae.add_metric(reconstruction_loss, name="reconstruction_loss", aggregation="mean")
+        vae.add_metric(kl_loss, name="kl_loss", aggregation="mean")
 
         vae.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate))
 
