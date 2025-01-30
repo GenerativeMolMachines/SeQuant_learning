@@ -100,7 +100,7 @@ for strategy in filter_strategy:
     )
 
     # set checkpoint
-    checkpoint_filepath = f'checkpoint/checkpoint_vae_004'
+    checkpoint_filepath = f'checkpoint/checkpoint_vae_010'
     model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
         filepath=checkpoint_filepath,
         save_weights_only=False,
@@ -109,7 +109,7 @@ for strategy in filter_strategy:
         save_best_only=True
     )
 
-    early_stop = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
+    early_stop = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=5)
 
     start_time = time.time()
 
@@ -122,11 +122,11 @@ for strategy in filter_strategy:
         callbacks=[early_stop, model_checkpoint_callback]
     )
 
-    with open(f'trainHistoryDict/vae_004.pkl', 'wb') as file_pi:
+    with open(f'trainHistoryDict/vae_010.pkl', 'wb') as file_pi:
         pickle.dump(history.history, file_pi)
 
     # load model learning history
-    with open(f'trainHistoryDict/vae_004.pkl', 'rb') as f:
+    with open(f'trainHistoryDict/vae_010.pkl', 'rb') as f:
         learning_history = pickle.load(f)
 
     print("--- %s seconds ---" % (time.time() - start_time))
