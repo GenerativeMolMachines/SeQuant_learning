@@ -49,7 +49,7 @@ with strategy.scope():
         save_best_only=True
     )
 
-    early_stop = tf.keras.callbacks.EarlyStopping(monitor='total_loss', patience=3)
+    early_stop = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
 
     latent_dim = 2
     encoder_inputs = keras.Input(shape=(46, 96, 1))
