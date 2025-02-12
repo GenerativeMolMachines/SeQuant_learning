@@ -35,7 +35,7 @@ train_dataset = data_processing(batch_data=train_data, max_len=96)
 gpus = tf.config.list_logical_devices('GPU')
 strategy = tf.distribute.MirroredStrategy(gpus)
 with strategy.scope():
-    checkpoint_filepath = f'checkpoint/checkpoint_vae_zh'
+    checkpoint_filepath = f'checkpoint/checkpoint_vae_zh' + '.keras'
     model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
         filepath=checkpoint_filepath,
         save_weights_only=False,
