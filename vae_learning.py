@@ -44,7 +44,7 @@ with strategy.scope():
     model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
         filepath=checkpoint_filepath,
         save_weights_only=False,
-        monitor='total_loss',
+        monitor='loss',
         mode='min',
         save_best_only=True
     )
