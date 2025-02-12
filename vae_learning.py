@@ -82,6 +82,8 @@ with strategy.scope():
 
     vae = VAE(encoder, decoder)
     vae.compile(optimizer=keras.optimizers.Adam())
+    input_shape = train_dataset.shape
+    vae.build(input_shape)
     history = vae.fit(train_dataset, epochs=100, batch_size=128, callbacks=[early_stop, model_checkpoint_callback])
     with open(f'trainHistoryDict/vae_01.pkl', 'wb') as file_pi:
         pickle.dump(history.history, file_pi)
