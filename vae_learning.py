@@ -16,8 +16,8 @@ os.environ["KERAS_BACKEND"] = "tensorflow"
 
 
 start_time = time.time()
-train_df = pd.read_csv('small_train_df.csv')
-# test_df = pd.read_csv('small_test_df.csv')
+train_df = pd.read_csv('data/small_train_df.csv')
+# test_df = pd.read_csv('data/small_test_df.csv')
 
 random.seed(42)
 train_df = train_df.loc[random.sample(list(train_df.index),30000)]
