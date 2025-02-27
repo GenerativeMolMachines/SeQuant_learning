@@ -24,7 +24,6 @@ train_df = pd.read_csv('data/small_train_df.csv')
 # test_df = pd.read_csv('data/small_test_df.csv')
 
 random.seed(42)
-train_df = train_df.loc[random.sample(list(train_df.index),30000)]
 # test_df = test_df.loc[random.sample(list(test_df.index),1000)]
 
 train_data = list(train_df['sequence'])
@@ -97,3 +96,4 @@ with strategy.scope():
         pickle.dump(history.history, file_pi)
 
 print("--- %s seconds ---" % (time.time() - start_time))
+
