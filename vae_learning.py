@@ -62,6 +62,10 @@ with strategy.scope():
 
     x = layers.Flatten()(x)
     x = BatchNormalization()(x)
+    x = layers.Dense(1104, activation="leaky_relu")(x)
+    x = BatchNormalization()(x)
+    x = layers.Dense(552, activation="leaky_relu")(x)
+    x = BatchNormalization()(x)
     x = layers.Dense(46, name="Latent")(x)
 
     z_mean = layers.Dense(latent_dim, name="z_mean")(x)
@@ -71,7 +75,11 @@ with strategy.scope():
     print(encoder.summary())
 
     latent_inputs = keras.Input(shape=(latent_dim,))
-    x = layers.Dense(4416, activation="relu")(latent_inputs)
+    x = layers.Dense(552, activation="leaky_relu")(latent_inputs)
+    x = BatchNormalization()(x)
+    x = layers.Dense(1104, activation="leaky_relu")(x)
+    x = BatchNormalization()(x)
+    x = layers.Dense(4416, activation="leaky_relu")(x)
     x = layers.Reshape((23, 3, 64))(x)
     x = layers.Conv2DTranspose(64, 3, activation="leaky_relu", strides=2, padding="same")(x)
     x = layers.Conv2DTranspose(32, 3, activation="leaky_relu", strides=(1, 4), padding="same")(x)
