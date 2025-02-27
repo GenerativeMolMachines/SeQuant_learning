@@ -20,13 +20,14 @@ os.environ["KERAS_BACKEND"] = "tensorflow"
 
 
 start_time = time.time()
-train_df = pd.read_csv('data/small_train_df.csv')
+train_df = pd.read_csv('data/large_train_df.csv')
 # test_df = pd.read_csv('data/small_test_df.csv')
 
 random.seed(42)
 # test_df = test_df.loc[random.sample(list(test_df.index),1000)]
 
 train_data = list(train_df['sequence'])
+print(len(train_data))
 # test_data = list(test_df['sequence'])
 # Oversampling
 np.random.shuffle(train_data)
